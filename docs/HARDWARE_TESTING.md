@@ -22,43 +22,7 @@ This guide provides comprehensive hardware testing procedures to validate that t
 - CI validates: Code compiles for ARM ✅
 - CI cannot validate: Code **runs** on ARM ❌
 
-**Solutions**:
-1. **Manual hardware testing** on actual Raspberry Pi devices (this guide)
-2. **Automated remote test execution** via SSH (see [`REMOTE_TESTING.md`](../REMOTE_TESTING.md))
-
-### Remote Test Execution Alternative
-
-**New in v1.6.0**: The platform now supports **automated remote test execution** using PlatformIO's test framework. This provides an automated alternative to manual testing:
-
-```ini
-[env:raspberrypi_3b]
-platform = linux_arm
-board = raspberrypi_3b
-
-; Upload configuration
-upload_protocol = scp
-upload_port = pi@raspberrypi.local:/tmp/program
-
-; Test configuration - automatically deploys and runs tests
-test_transport = ssh
-test_build_src = yes
-```
-
-**When to use remote testing vs. manual testing:**
-- **Remote Testing** (automated):
-  - Unit tests (business logic validation)
-  - Integration tests (automated GPIO, I2C, SPI tests)
-  - CI/CD pipelines (automated test runs)
-  - Regression testing (run tests frequently)
-
-- **Manual Testing** (this guide):
-  - Initial platform validation
-  - Visual verification (LED blink, displays)
-  - Exploratory testing
-  - One-time board verification
-  - Troubleshooting issues
-
-**See also**: [`REMOTE_TESTING.md`](../REMOTE_TESTING.md) for comprehensive remote testing guide
+**Solution**: Manual hardware testing on actual Raspberry Pi devices
 
 ---
 
