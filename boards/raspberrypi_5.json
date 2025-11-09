@@ -6,7 +6,8 @@
   },
   "frameworks": [
     "lgpio",
-    "libgpiod"
+    "libgpiod",
+    "wiringpi"
   ],
   "name": "Raspberry Pi 5",
   "upload": {

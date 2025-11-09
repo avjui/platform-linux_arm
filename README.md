@@ -55,7 +55,7 @@ When running PlatformIO directly on a Raspberry Pi or other ARM Linux system, th
 - `raspberrypi_3b` - Raspberry Pi 3 Model B
 - `raspberrypi_4b` - Raspberry Pi 4 Model B
 - `raspberrypi_400` - Raspberry Pi 400 (keyboard computer, 1.8GHz)
-- `raspberrypi_5` - Raspberry Pi 5 (lgpio framework only)
+- `raspberrypi_5` - Raspberry Pi 5 (lgpio recommended, WiringPi has GCLK limitation)
 - `raspberrypi_cm4` - Raspberry Pi Compute Module 4
 - `raspberrypi_zero` - Raspberry Pi Zero
 - `raspberrypi_zero2w` - Raspberry Pi Zero 2 W
@@ -129,18 +129,33 @@ sudo apt install libpigpio-dev pigpio
 
 See `examples/pigpio-blink/` for a complete example.
 
-## WiringPi Framework (Legacy)
+## WiringPi Framework (GC2 Fork)
 
-Classic GPIO library for compatibility with older projects:
+Classic GPIO library with Arduino-like API, now maintained by GC2 (Grazer Computer Club) with Pi 5 support:
 
 ```ini
-[env:raspberrypi_3b]
+[env:raspberrypi_5]
 platform = linux_arm
 framework = wiringpi
-board = raspberrypi_3b
+board = raspberrypi_5
 ```
 
-**Note:** WiringPi framework currently requires building directly on a Raspberry Pi device (cross-compilation is not supported for WiringPi).
+**System requirements:**
+```bash
+sudo apt install wiringpi
+```
+
+Or build from source:
+```bash
+git clone https://github.com/WiringPi/WiringPi.git
+cd WiringPi
+./build debian
+sudo apt install ./wiringpi-*.deb
+```
+
+**Pi 5 Limitations:** The GCLK (general purpose clock) functionality is not supported on Pi 5 due to RP1 chip documentation limitations. For full Pi 5 GPIO functionality, use the lgpio framework instead.
+
+**Note:** WiringPi currently requires building directly on a Raspberry Pi device (cross-compilation is not supported for WiringPi).
 
 See `examples/wiringpi-blink/` and `examples/wiringpi-serial/` for complete examples.
 
