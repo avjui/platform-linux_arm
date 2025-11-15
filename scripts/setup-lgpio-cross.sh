@@ -13,7 +13,6 @@ echo ""
 # Resolve script and repo directories BEFORE any cd commands
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-BUILD_DIR="${BUILD_DIR:-/tmp/lg-build}"
 CROSS_PREFIX="${CROSS_PREFIX:-arm-linux-gnueabihf-}"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/arm-linux-gnueabihf}"
 
