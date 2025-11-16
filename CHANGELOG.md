@@ -88,6 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Path without trailing `/` → treated as full file path
   - Display destination and final executable path in upload output
   - Register custom config options in platform.json (eliminates warnings)
+  - Monitor target now skips execution when `upload_run_after=true` (prevents duplicate runs)
 
 ### Changed
 

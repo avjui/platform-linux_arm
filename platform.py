@@ -871,22 +871,37 @@ class Linux_armPlatform(PlatformBase):
             Requires upload_port to be configured in platformio.ini.
             Optionally supports upload_run_command for custom execution.
             Uses upload_run_timeout for timeout protection (default: 60 seconds).
+            If upload_run_after=true, monitor is skipped (program already ran).
 
         Example:
             Configure in platformio.ini:
             >>> upload_protocol = scp
             >>> upload_port = pi@raspberrypi.local:/home/pi/program
-            >>> upload_run_command = sudo ./program  # optional
 
-            Then run:
-            >>> pio run --target upload --target monitor
-            >>> # or separately:
+            Option 1 - Run once after upload:
+            >>> upload_run_after = true
+            >>> pio run --target upload
+
+            Option 2 - Interactive monitoring:
             >>> pio run --target monitor
         """
         # Lazy import to avoid breaking platform loading
         if _PLATFORM_DIR not in sys.path:
             sys.path.insert(0, _PLATFORM_DIR)
         from platform_constants import UIConstants, SSHDefaults
+
+        # If upload_run_after is enabled, skip monitor (program already ran during upload)
+        if env.GetProjectOption("upload_run_after", False):
+            separator = UIConstants.SEPARATOR_CHAR * UIConstants.SEPARATOR_WIDTH
+            print("\n" + separator)
+            print("MONITOR SKIPPED")
+            print(separator)
+            print("\nProgram already executed via upload_run_after=true")
+            print("\nTo use monitor instead:")
+            print("  1. Remove 'upload_run_after = true' from platformio.ini")
+            print("  2. Run: pio run --target upload --target monitor")
+            print(separator + "\n")
+            return 0
 
         upload_port = env.GetProjectOption("upload_port", None)
         if not upload_port:
