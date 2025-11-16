@@ -26,6 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **VSCode Integration**
+  - Custom tasks for SSH monitoring (examples/vscode/tasks.json)
+  - Comprehensive VSCode integration guide (docs/VSCODE.md)
+  - Workaround for PlatformIO GUI Monitor button limitation
+  - Welcome message on first platform use with setup instructions
+  - Updated example projects to include .vscode/tasks.json
+  - Prominent README notice for VSCode users
+
 - **libgpiod Framework Cross-Compilation** (#78, #82, #86, #94)
   - Windows cross-compilation via MSYS2 (#82)
   - macOS cross-compilation support (#94)
@@ -87,6 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Path ending with `/` → treated as directory, program name appended
   - Path without trailing `/` → treated as full file path
   - Display destination and final executable path in upload output
+  - Register custom config options in platform.json (eliminates warnings)
+  - Monitor target now skips execution when `upload_run_after=true` (prevents duplicate runs)
 
 ### Changed
 

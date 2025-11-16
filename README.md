@@ -29,6 +29,8 @@ Linux ARM platform enables building native applications for ARM-based Linux syst
 
 > **Note for VS Code users:** The PlatformIO GUI's "Monitor" button is for serial ports only and does not work with this platform. For SSH monitoring support, copy [examples/vscode/tasks.json](examples/vscode/tasks.json) to your project's `.vscode/` folder. See [docs/VSCODE.md](docs/VSCODE.md) for details.
 
+> **📌 VS Code Users:** The PlatformIO GUI's "Monitor" button doesn't work with this platform (it's for serial ports only). Copy [examples/vscode/tasks.json](examples/vscode/tasks.json) to your project's `.vscode/` folder for SSH monitoring support. See [docs/VSCODE.md](docs/VSCODE.md) for details.
+
 ## Installation
 
 ### 1. Install PlatformIO

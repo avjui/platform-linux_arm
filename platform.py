@@ -192,14 +192,14 @@ class Linux_armPlatform(PlatformBase):
         print("\n" + "=" * 70)
         print("  Welcome to Linux ARM Platform!")
         print("=" * 70)
-        print("\n[!] Important for VS Code Users:")
-        print("    The PlatformIO GUI Monitor button doesn't work with this platform.")
-        print("    Copy examples/vscode/tasks.json to your project's .vscode/ folder.")
-        print("    See: https://github.com/sfo2001/platform-linux_arm/blob/develop/docs/VSCODE.md")
-        print("\n[i] Documentation:")
-        print("    - Remote Deployment: docs/UPLOAD.md")
-        print("    - Remote Testing:    docs/TESTING.md")
-        print("    - VSCode Setup:      docs/VSCODE.md")
+        print("\n📌 Important for VS Code Users:")
+        print("   The PlatformIO GUI Monitor button doesn't work with this platform.")
+        print("   Copy examples/vscode/tasks.json to your project's .vscode/ folder.")
+        print("   See: https://github.com/sfo2001/platform-linux_arm/blob/develop/docs/VSCODE.md")
+        print("\n📚 Documentation:")
+        print("   - Remote Deployment: docs/UPLOAD.md")
+        print("   - Remote Testing:    docs/TESTING.md")
+        print("   - VSCode Setup:      docs/VSCODE.md")
         print("\n" + "=" * 70 + "\n")
 
     @staticmethod
@@ -612,15 +612,6 @@ class Linux_armPlatform(PlatformBase):
         print("="*60)
         print(f"Source:      {source[0]}")
         print(f"Destination: {user}@{host}:{path}")
-
-        # Show final executable path for clarity
-        program_name = os.path.basename(str(source[0]))
-        if path.endswith('/'):
-            final_path = os.path.join(path, program_name)
-            print(f"Program:     {final_path}")
-        else:
-            print(f"Program:     {path}")
-
         print(f"SSH Port:    {ssh_port}")
         if ssh_key:
             print(f"SSH Key:     {ssh_key}")
@@ -714,15 +705,6 @@ class Linux_armPlatform(PlatformBase):
         print("="*60)
         print(f"Source:      {source[0]}")
         print(f"Destination: {user}@{host}:{path}")
-
-        # Show final executable path for clarity
-        program_name = os.path.basename(str(source[0]))
-        if path.endswith('/'):
-            final_path = os.path.join(path, program_name)
-            print(f"Program:     {final_path}")
-        else:
-            print(f"Program:     {path}")
-
         print(f"SSH Port:    {ssh_port}")
         if ssh_key:
             print(f"SSH Key:     {ssh_key}")
@@ -920,18 +902,7 @@ class Linux_armPlatform(PlatformBase):
         ssh_port = env.GetProjectOption("upload_ssh_port", self._get_config_default("upload_ssh_port", SSHDefaults.PORT))
         ssh_key = env.GetProjectOption("upload_ssh_key", self._get_config_default("upload_ssh_key", None))
 
-        # When monitor is called independently (not after upload), source is not available
-        # Create a pseudo-source list with the program path from the build environment
-        if not source or len(source) == 0:
-            # Get program path from environment (typically .pio/build/<env>/program)
-            progpath = env.get("PROGPATH")
-            if progpath:
-                # Expand SCons variables like $BUILD_DIR, $PROGNAME, $PROGSUFFIX
-                expanded_path = env.subst(progpath)
-                # Create a list with the program path so _run_remote_command can extract the basename
-                source = [expanded_path]
-
-        # Run the remote command and stream output
+        # Run the remote command and stream output (source not available in monitor context)
         return self._run_remote_command(user, host, ssh_port, ssh_key, path, env, source)
 
     def _determine_gdb_executable(self, target_arch: str) -> str:
