@@ -764,7 +764,9 @@ class Linux_armPlatform(PlatformBase):
             host: SSH hostname or IP address.
             ssh_port: SSH port number.
             ssh_key: Path to SSH private key file (optional).
-            remote_path: Path to program on remote host (file or directory).
+            remote_path: Path to program on remote host.
+                - If ends with '/': treated as directory, program name appended
+                - Otherwise: treated as full file path, used as-is
             env: PlatformIO environment object.
             source: Optional source file path for extracting program name.
 
@@ -778,7 +780,10 @@ class Linux_armPlatform(PlatformBase):
             Supports custom run commands via upload_run_command option.
             Default timeout: 60 seconds (configurable via upload_run_timeout).
             Output is streamed directly to console (interactive mode).
-            If remote_path is a directory, the program name from source is appended.
+
+        Examples:
+            upload_port = user@host:/home/user/bin/      → executes /home/user/bin/program
+            upload_port = user@host:/home/user/myapp     → executes /home/user/myapp
         """
         # Lazy import to avoid breaking platform loading
         if _PLATFORM_DIR not in sys.path:
@@ -805,21 +810,13 @@ class Linux_armPlatform(PlatformBase):
             remote_command = run_command
         else:
             # Determine the actual executable path
-            executable_path = remote_path
-
-            # If remote_path looks like a directory (ends with /) and we have source info,
-            # append the program filename
+            # Rule: If remote_path ends with '/', it's a directory - append program name
+            #       Otherwise, it's the full file path - use as-is
             if source and remote_path.endswith('/'):
                 program_name = os.path.basename(str(source[0]))
                 executable_path = os.path.join(remote_path, program_name)
-            # If remote_path doesn't end with / but source filename differs from path basename,
-            # it's likely a directory - append the filename
-            elif source:
-                program_name = os.path.basename(str(source[0]))
-                remote_basename = os.path.basename(remote_path)
-                # Check if remote_path is likely a directory (no extension, common directory names)
-                if not remote_basename or '.' not in remote_basename:
-                    executable_path = os.path.join(remote_path, program_name)
+            else:
+                executable_path = remote_path
 
             # For simple path execution, quote the path to prevent injection
             remote_command = shlex.quote(executable_path)
