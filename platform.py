@@ -909,24 +909,57 @@ class Linux_armPlatform(PlatformBase):
         """
         Determine GDB executable path based on target architecture.
 
+        Tries to find available GDB executables in this order:
+        1. Multi-arch GDB (gdb-multiarch) - common on Linux
+        2. Architecture-specific GDB - from cross-toolchain packages
+        3. System GDB - for native compilation
+
         Args:
             target_arch: Target architecture (e.g., 'aarch64', 'armv7')
 
         Returns:
             Path to appropriate GDB executable
+
+        Raises:
+            exception.PlatformioException: If no suitable GDB found
         """
         # Lazy import to avoid breaking platform loading
         if _PLATFORM_DIR not in sys.path:
             sys.path.insert(0, _PLATFORM_DIR)
         from platform_constants import GDBExecutable, Architecture
 
+        # For native ARM Linux, use system GDB
         if self._is_native():
             return GDBExecutable.NATIVE
 
+        # Determine architecture-specific GDB name
         if target_arch == Architecture.AARCH64:
-            return GDBExecutable.AARCH64
+            arch_specific_gdb = GDBExecutable.AARCH64
+        else:
+            arch_specific_gdb = GDBExecutable.ARMV7
 
-        return GDBExecutable.ARMV7
+        # Try to find available GDB in order of preference
+        # 1. Multi-arch GDB (recommended on Linux, works for all architectures)
+        # 2. Architecture-specific GDB (from cross-toolchain, macOS/Linux)
+        # 3. System GDB (last resort)
+        candidates = [
+            "gdb-multiarch",           # Linux multi-arch GDB
+            arch_specific_gdb,         # Architecture-specific GDB
+            GDBExecutable.NATIVE       # System GDB
+        ]
+
+        for gdb_cmd in candidates:
+            if shutil.which(gdb_cmd):
+                return gdb_cmd
+
+        # No GDB found - provide helpful error message
+        raise exception.PlatformioException(
+            f"No suitable GDB found for {target_arch} debugging.\n"
+            f"Please install one of:\n"
+            f"  Linux:   sudo apt install gdb-multiarch\n"
+            f"  macOS:   brew install {arch_specific_gdb.replace('-gdb', '')}\n"
+            f"  Windows: Install cross-toolchain with GDB"
+        )
 
     def _parse_debug_connection_info(self, debug_config: dict) -> tuple:
         """
