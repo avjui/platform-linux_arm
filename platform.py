@@ -923,7 +923,18 @@ class Linux_armPlatform(PlatformBase):
         ssh_port = env.GetProjectOption("upload_ssh_port", self._get_config_default("upload_ssh_port", SSHDefaults.PORT))
         ssh_key = env.GetProjectOption("upload_ssh_key", self._get_config_default("upload_ssh_key", None))
 
-        # Run the remote command and stream output (source not available in monitor context)
+        # When monitor is called independently (not after upload), source is not available
+        # Create a pseudo-source list with the program path from the build environment
+        if not source or len(source) == 0:
+            # Get program path from environment (typically .pio/build/<env>/program)
+            progpath = env.get("PROGPATH")
+            if progpath:
+                # Expand SCons variables like $BUILD_DIR, $PROGNAME, $PROGSUFFIX
+                expanded_path = env.subst(progpath)
+                # Create a list with the program path so _run_remote_command can extract the basename
+                source = [expanded_path]
+
+        # Run the remote command and stream output
         return self._run_remote_command(user, host, ssh_port, ssh_key, path, env, source)
 
     def _determine_gdb_executable(self, target_arch: str) -> str:
