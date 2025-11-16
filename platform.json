@@ -50,6 +50,44 @@
       "version": "~1.40802.0"
     }
   },
+  "projectConf": {
+    "upload_run_after": {
+      "type": "bool",
+      "description": "Execute uploaded program immediately after successful upload"
+    },
+    "upload_run_command": {
+      "type": "string",
+      "description": "Custom command to run the uploaded program (overrides default execution)"
+    },
+    "upload_run_timeout": {
+      "type": "number",
+      "description": "Timeout for remote program execution in seconds (default: 60)"
+    },
+    "upload_user": {
+      "type": "string",
+      "description": "Default SSH username for uploads (default: pi)"
+    },
+    "upload_path": {
+      "type": "string",
+      "description": "Default remote path for uploads (default: /tmp/program)"
+    },
+    "upload_ssh_port": {
+      "type": "number",
+      "description": "SSH port for uploads (default: 22)"
+    },
+    "upload_ssh_key": {
+      "type": "string",
+      "description": "Path to SSH private key for authentication"
+    },
+    "upload_timeout": {
+      "type": "number",
+      "description": "Upload timeout in seconds (default: 300)"
+    },
+    "test_transport": {
+      "type": "string",
+      "description": "Test upload transport: ssh or manual (default: ssh)"
+    }
+  },
   "debug": {
     "tools": {
       "gdb-remote": {

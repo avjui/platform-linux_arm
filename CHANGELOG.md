@@ -83,9 +83,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - C++ bindings disabled for Windows cross-compilation
 
 - **Upload & Run**
-  - Fix `upload_run_after` when `upload_port` specifies a directory path
-  - Automatically append program filename to directory paths
-  - Display correct executable path in remote execution output
+  - Fix `upload_run_after` path handling with clear directory/file distinction
+  - Path ending with `/` → treated as directory, program name appended
+  - Path without trailing `/` → treated as full file path
+  - Display destination and final executable path in upload output
+  - Register custom config options in platform.json (eliminates warnings)
 
 ### Changed
 
