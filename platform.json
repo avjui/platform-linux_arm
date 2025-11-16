@@ -2,7 +2,7 @@
   "name": "linux_arm",
   "title": "Linux ARM",
   "description": "Linux ARM is a Unix-like and mostly POSIX-compliant computer operating system (OS) assembled under the model of free and open-source software development and distribution. Using host OS (Mac OS X, Linux ARM) you can build native application for Linux ARM platform.",
-  "homepage": "https://registry.platformio.org/platforms/platformio/linux_arm",
+  "homepage": "https://github.com/sfo2001/platform-linux_arm",
   "license": "Apache-2.0",
   "keywords": [
     "dev-platform",
@@ -14,15 +14,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/platformio/platform-linux_arm.git"
+    "url": "https://github.com/sfo2001/platform-linux_arm.git"
   },
-  "version": "1.6.0",
+  "version": "1.8.0",
   "frameworks": {
-    "wiringpi": {
-      "script": "builder/frameworks/wiringpi.py",
-      "description": "WiringPi is a GPIO access library written in C for the BCM2835+ used in the Raspberry Pi. Now maintained by GC2 (Grazer Computer Club) with Raspberry Pi 5 support (GCLK function not supported on Pi 5)",
-      "url": "https://github.com/WiringPi/WiringPi",
-      "title": "WiringPi (GC2 Fork)"
+    "libgpiod": {
+      "script": "builder/frameworks/libgpiod.py",
+      "description": "libgpiod is the official Linux kernel GPIO library using the character device interface (/dev/gpiochip*). Works across all Linux ARM SBCs (Raspberry Pi, Orange Pi, Rock Pi, etc.) with kernel-enforced GPIO exclusivity",
+      "url": "https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/",
+      "title": "libgpiod"
     },
     "lgpio": {
       "script": "builder/frameworks/lgpio.py",
@@ -30,11 +30,11 @@
       "url": "http://abyz.me.uk/lg/index.html",
       "title": "lgpio"
     },
-    "libgpiod": {
-      "script": "builder/frameworks/libgpiod.py",
-      "description": "libgpiod is the official Linux kernel GPIO library using the character device interface (/dev/gpiochip*). Works across all Linux ARM SBCs (Raspberry Pi, Orange Pi, Rock Pi, etc.) with kernel-enforced GPIO exclusivity",
-      "url": "https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/",
-      "title": "libgpiod"
+    "wiringpi": {
+      "script": "builder/frameworks/wiringpi.py",
+      "description": "WiringPi is a GPIO access library written in C for the BCM2835+ used in the Raspberry Pi. Now maintained by GC2 (Grazer Computer Club) with Raspberry Pi 5 support (GCLK function not supported on Pi 5)",
+      "url": "https://github.com/WiringPi/WiringPi",
+      "title": "WiringPi (GC2 Fork)"
     },
     "pigpio": {
       "script": "builder/frameworks/pigpio.py",
@@ -48,44 +48,6 @@
       "type": "toolchain",
       "owner": "platformio",
       "version": "~1.40802.0"
-    }
-  },
-  "projectConf": {
-    "upload_run_after": {
-      "type": "bool",
-      "description": "Execute uploaded program immediately after successful upload"
-    },
-    "upload_run_command": {
-      "type": "string",
-      "description": "Custom command to run the uploaded program (overrides default execution)"
-    },
-    "upload_run_timeout": {
-      "type": "number",
-      "description": "Timeout for remote program execution in seconds (default: 60)"
-    },
-    "upload_user": {
-      "type": "string",
-      "description": "Default SSH username for uploads (default: pi)"
-    },
-    "upload_path": {
-      "type": "string",
-      "description": "Default remote path for uploads (default: /tmp/program)"
-    },
-    "upload_ssh_port": {
-      "type": "number",
-      "description": "SSH port for uploads (default: 22)"
-    },
-    "upload_ssh_key": {
-      "type": "string",
-      "description": "Path to SSH private key for authentication"
-    },
-    "upload_timeout": {
-      "type": "number",
-      "description": "Upload timeout in seconds (default: 300)"
-    },
-    "test_transport": {
-      "type": "string",
-      "description": "Test upload transport: ssh or manual (default: ssh)"
     }
   },
   "debug": {

@@ -551,7 +551,7 @@ class Linux_armPlatform(PlatformBase):
 
         # Post-upload execution if configured
         if env.GetProjectOption("upload_run_after", False):
-            return self._run_remote_command(user, host, ssh_port, ssh_key, path, env)
+            return self._run_remote_command(user, host, ssh_port, ssh_key, path, env, source)
 
         return 0
 
@@ -649,7 +649,7 @@ class Linux_armPlatform(PlatformBase):
 
         # Post-upload execution if configured
         if env.GetProjectOption("upload_run_after", False):
-            return self._run_remote_command(user, host, ssh_port, ssh_key, path, env)
+            return self._run_remote_command(user, host, ssh_port, ssh_key, path, env, source)
 
         return 0
 
@@ -751,7 +751,7 @@ class Linux_armPlatform(PlatformBase):
 
         # Post-upload execution if configured
         if env.GetProjectOption("upload_run_after", False):
-            return self._run_remote_command(user, host, ssh_port, ssh_key, path, env)
+            return self._run_remote_command(user, host, ssh_port, ssh_key, path, env, source)
 
         return 0
 
@@ -764,9 +764,9 @@ class Linux_armPlatform(PlatformBase):
             host: SSH hostname or IP address.
             ssh_port: SSH port number.
             ssh_key: Path to SSH private key file (optional).
-            remote_path: Path to program on remote host.
+            remote_path: Path to program on remote host (file or directory).
             env: PlatformIO environment object.
-            source: Source file path (optional, for future use).
+            source: Optional source file path for extracting program name.
 
         Returns:
             int: Exit code from remote program execution.
@@ -778,6 +778,7 @@ class Linux_armPlatform(PlatformBase):
             Supports custom run commands via upload_run_command option.
             Default timeout: 60 seconds (configurable via upload_run_timeout).
             Output is streamed directly to console (interactive mode).
+            If remote_path is a directory, the program name from source is appended.
         """
         # Lazy import to avoid breaking platform loading
         if _PLATFORM_DIR not in sys.path:
@@ -803,8 +804,25 @@ class Linux_armPlatform(PlatformBase):
             # Custom commands are trusted (from platformio.ini), passed as-is
             remote_command = run_command
         else:
+            # Determine the actual executable path
+            executable_path = remote_path
+
+            # If remote_path looks like a directory (ends with /) and we have source info,
+            # append the program filename
+            if source and remote_path.endswith('/'):
+                program_name = os.path.basename(str(source[0]))
+                executable_path = os.path.join(remote_path, program_name)
+            # If remote_path doesn't end with / but source filename differs from path basename,
+            # it's likely a directory - append the filename
+            elif source:
+                program_name = os.path.basename(str(source[0]))
+                remote_basename = os.path.basename(remote_path)
+                # Check if remote_path is likely a directory (no extension, common directory names)
+                if not remote_basename or '.' not in remote_basename:
+                    executable_path = os.path.join(remote_path, program_name)
+
             # For simple path execution, quote the path to prevent injection
-            remote_command = shlex.quote(remote_path)
+            remote_command = shlex.quote(executable_path)
 
         # Build SSH command using shared builder
         builder = SSHCommandBuilder(config)
@@ -815,7 +833,7 @@ class Linux_armPlatform(PlatformBase):
         print("RUNNING REMOTE PROGRAM")
         print("="*60)
         print(f"Target: {user}@{host}")
-        print(f"Command: {run_command if run_command else remote_path}")
+        print(f"Command: {run_command if run_command else executable_path}")
         print(separator + "\n")
 
         # Execute remote command with timeout protection (interactive - shows output directly)
@@ -890,8 +908,8 @@ class Linux_armPlatform(PlatformBase):
         ssh_port = env.GetProjectOption("upload_ssh_port", self._get_config_default("upload_ssh_port", SSHDefaults.PORT))
         ssh_key = env.GetProjectOption("upload_ssh_key", self._get_config_default("upload_ssh_key", None))
 
-        # Run the remote command and stream output
-        return self._run_remote_command(user, host, ssh_port, ssh_key, path, env)
+        # Run the remote command and stream output (source not available in monitor context)
+        return self._run_remote_command(user, host, ssh_port, ssh_key, path, env, source)
 
     def _determine_gdb_executable(self, target_arch: str) -> str:
         """
