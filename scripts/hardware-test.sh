@@ -41,14 +41,14 @@ echo ""
 # Verify SSH connectivity
 echo "Checking SSH connectivity..."
 if ! ssh -o ConnectTimeout=5 "$TARGET_HOST" "echo OK" > /dev/null 2>&1; then
-    echo -e "${RED}❌ Cannot connect to $TARGET_HOST${NC}"
+    echo -e "${RED}ERROR: Cannot connect to $TARGET_HOST${NC}"
     echo "Please check:"
     echo "  - Target is powered on and connected to network"
     echo "  - SSH is enabled on target"
     echo "  - Hostname/IP is correct"
     exit 1
 fi
-echo -e "${GREEN}✅ SSH connection OK${NC}"
+echo -e "${GREEN}SSH connection OK${NC}"
 echo ""
 
 # Test counter
@@ -72,39 +72,39 @@ run_test() {
     # Build
     echo "Building $example_dir for $BOARD..."
     if ! pio run -d "$example_dir" -e "$BOARD" 2>&1 | grep -v "^Processing"; then
-        echo -e "${RED}❌ BUILD FAILED${NC}"
+        echo -e "${RED}BUILD FAILED${NC}"
         TESTS_FAILED=$((TESTS_FAILED + 1))
         echo ""
         return 1
     fi
-    echo -e "${GREEN}✅ Build successful${NC}"
+    echo -e "${GREEN}Build successful${NC}"
 
     # Deploy
     echo "Deploying to $TARGET_HOST:$target_path..."
     if ! scp -q "$example_dir/.pio/build/$BOARD/program" "$TARGET_HOST:$target_path"; then
-        echo -e "${RED}❌ DEPLOY FAILED${NC}"
+        echo -e "${RED}DEPLOY FAILED${NC}"
         TESTS_FAILED=$((TESTS_FAILED + 1))
         echo ""
         return 1
     fi
-    echo -e "${GREEN}✅ Deploy successful${NC}"
+    echo -e "${GREEN}Deploy successful${NC}"
 
     # Execute
     echo "Executing on target (timeout: ${timeout_sec}s)..."
     if ! ssh "$TARGET_HOST" "timeout $timeout_sec $run_cmd" 2>&1; then
         # Check if timeout was expected (Ctrl+C needed for blink examples)
         if [ $? -eq 124 ]; then
-            echo -e "${YELLOW}⚠️  Program timed out (expected for blink examples)${NC}"
-            echo -e "${GREEN}✅ Test PASSED: $test_name (GPIO blink running)${NC}"
+            echo -e "${YELLOW}WARNING: Program timed out (expected for blink examples)${NC}"
+            echo -e "${GREEN}Test PASSED: $test_name (GPIO blink running)${NC}"
             TESTS_PASSED=$((TESTS_PASSED + 1))
         else
-            echo -e "${RED}❌ EXECUTION FAILED${NC}"
+            echo -e "${RED}EXECUTION FAILED${NC}"
             TESTS_FAILED=$((TESTS_FAILED + 1))
             echo ""
             return 1
         fi
     else
-        echo -e "${GREEN}✅ Test PASSED: $test_name${NC}"
+        echo -e "${GREEN}Test PASSED: $test_name${NC}"
         TESTS_PASSED=$((TESTS_PASSED + 1))
     fi
 
@@ -178,7 +178,7 @@ else
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "Test: pigpio GPIO Blink"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo -e "${YELLOW}⏭️  SKIPPED: pigpio incompatible with Pi 5${NC}"
+    echo -e "${YELLOW}SKIPPED: pigpio incompatible with Pi 5${NC}"
     echo ""
 fi
 
@@ -190,12 +190,12 @@ echo "Board:  $BOARD"
 echo "Target: $TARGET_HOST"
 echo ""
 echo "Total:  $TESTS_TOTAL"
-echo -e "Passed: ${GREEN}$TESTS_PASSED ✅${NC}"
-echo -e "Failed: ${RED}$TESTS_FAILED ❌${NC}"
+echo -e "Passed: ${GREEN}$TESTS_PASSED${NC}"
+echo -e "Failed: ${RED}$TESTS_FAILED${NC}"
 echo ""
 
 if [ "$TESTS_FAILED" -eq 0 ]; then
-    echo -e "${GREEN}✅ All tests passed!${NC}"
+    echo -e "${GREEN}All tests passed!${NC}"
     echo ""
     echo "Next steps:"
     echo "  1. Document results in docs/HARDWARE_TEST_RESULTS.md"
@@ -203,7 +203,7 @@ if [ "$TESTS_FAILED" -eq 0 ]; then
     echo "  3. Test on other Pi models if available"
     exit 0
 else
-    echo -e "${RED}❌ Some tests failed - review output above${NC}"
+    echo -e "${RED}Some tests failed - review output above${NC}"
     echo ""
     echo "Troubleshooting:"
     echo "  - Check target has required libraries installed (run scripts/setup-target.sh)"

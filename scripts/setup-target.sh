@@ -30,7 +30,7 @@ sudo apt-get install -y pigpio
 # Add current user to gpio group (for non-root GPIO access)
 echo "Adding $USER to gpio group..."
 sudo usermod -a -G gpio $USER
-echo "⚠️  You must logout/login for gpio group to take effect"
+echo "WARNING: You must logout/login for gpio group to take effect"
 
 # Verify installations
 echo ""
@@ -49,9 +49,9 @@ if [ -f /etc/os-release ]; then
 fi
 
 echo ""
-echo "✅ Setup complete!"
+echo "Setup complete!"
 echo ""
-echo "⚠️  IMPORTANT: Logout and login again for gpio group membership to take effect"
+echo "IMPORTANT: Logout and login again for gpio group membership to take effect"
 echo "    Then you can run GPIO programs without sudo (for lgpio/pigpio)"
 echo ""
 echo "Next steps:"

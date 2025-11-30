@@ -30,7 +30,7 @@ fi
 # Check if cross-compiler is installed
 CROSS_GCC="${CROSS_PREFIX}gcc"
 if ! command -v "$CROSS_GCC" &> /dev/null; then
-    echo "❌ ERROR: Cross-compiler not found: $CROSS_GCC"
+    echo "ERROR: Cross-compiler not found: $CROSS_GCC"
     echo ""
     echo "Please install it first:"
     if [[ "$CROSS_PREFIX" == "aarch64-"* ]]; then
@@ -42,7 +42,7 @@ if ! command -v "$CROSS_GCC" &> /dev/null; then
     exit 1
 fi
 
-echo "✓ Cross-compiler found: $($CROSS_GCC --version | head -1)"
+echo "Cross-compiler found: $($CROSS_GCC --version | head -1)"
 echo "  Architecture: $ARCH_NAME"
 echo ""
 
@@ -91,7 +91,7 @@ cd "$INSTALL_DIR/lib"
 
 echo ""
 echo "=================================================="
-echo "✓ lgpio cross-compilation setup complete!"
+echo "lgpio cross-compilation setup complete!"
 echo "=================================================="
 echo ""
 echo "Headers installed to: $INSTALL_DIR/include/"

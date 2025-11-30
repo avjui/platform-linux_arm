@@ -31,7 +31,7 @@ fi
 
 echo "Checking MSYS2 environment..."
 if ! command -v autoconf &> /dev/null; then
-    echo "❌ ERROR: MSYS2 build tools not found."
+    echo "ERROR: MSYS2 build tools not found."
     echo ""
     echo "This script requires MSYS2 with build tools installed."
     echo "Please install MSYS2 from https://www.msys2.org/"
@@ -40,13 +40,13 @@ if ! command -v autoconf &> /dev/null; then
     exit 1
 fi
 
-echo "✓ MSYS2 environment detected"
+echo "MSYS2 environment detected"
 echo ""
 
 # Verify cross-compiler is available (should be in PATH from CI workflow)
 CROSS_GCC="${CROSS_PREFIX}gcc"
 if ! command -v "$CROSS_GCC" &> /dev/null; then
-    echo "❌ ERROR: Cross-compiler not found: ${CROSS_PREFIX}gcc"
+    echo "ERROR: Cross-compiler not found: ${CROSS_PREFIX}gcc"
     echo ""
     echo "Please ensure the ARM cross-compilation toolchain is in your PATH."
     echo "For Windows, download from: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads"
@@ -57,7 +57,7 @@ if ! command -v "$CROSS_GCC" &> /dev/null; then
     exit 1
 fi
 
-echo "✓ Cross-compiler found: $($CROSS_GCC --version | head -1)"
+echo "Cross-compiler found: $($CROSS_GCC --version | head -1)"
 echo "  Architecture: $ARCH_NAME"
 echo "  Cross-compiler prefix: $CROSS_PREFIX"
 echo ""
@@ -144,7 +144,7 @@ make install
 
 echo ""
 echo "=================================================="
-echo "✓ libgpiod cross-compilation setup complete!"
+echo "libgpiod cross-compilation setup complete!"
 echo "=================================================="
 echo ""
 echo "Installation summary:"

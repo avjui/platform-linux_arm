@@ -30,7 +30,7 @@ fi
 # Check if cross-compiler is installed
 CROSS_GCC="${CROSS_PREFIX}gcc"
 if ! command -v "$CROSS_GCC" &> /dev/null; then
-    echo "❌ ERROR: Cross-compiler not found: $CROSS_GCC"
+    echo "ERROR: Cross-compiler not found: $CROSS_GCC"
     echo ""
     echo "Please install it first:"
     if [[ "$CROSS_PREFIX" == "aarch64-"* ]]; then
@@ -42,7 +42,7 @@ if ! command -v "$CROSS_GCC" &> /dev/null; then
     exit 1
 fi
 
-echo "✓ Cross-compiler found: $($CROSS_GCC --version | head -1)"
+echo "Cross-compiler found: $($CROSS_GCC --version | head -1)"
 echo "  Architecture: $ARCH_NAME"
 echo ""
 
@@ -55,7 +55,7 @@ for tool in autoconf automake pkg-config; do
 done
 
 if [ ${#MISSING_TOOLS[@]} -ne 0 ]; then
-    echo "❌ ERROR: Missing required build tools: ${MISSING_TOOLS[*]}"
+    echo "ERROR: Missing required build tools: ${MISSING_TOOLS[*]}"
     echo ""
     echo "Please install them first:"
     echo "  sudo apt install autoconf autoconf-archive automake libtool pkg-config"
@@ -63,7 +63,7 @@ if [ ${#MISSING_TOOLS[@]} -ne 0 ]; then
     exit 1
 fi
 
-echo "✓ Build tools found: autoconf, automake, pkg-config"
+echo "Build tools found: autoconf, automake, pkg-config"
 echo ""
 
 echo "Build directory: $BUILD_DIR"
@@ -149,7 +149,7 @@ make install
 
 echo ""
 echo "=================================================="
-echo "✓ libgpiod cross-compilation setup complete!"
+echo "libgpiod cross-compilation setup complete!"
 echo "=================================================="
 echo ""
 echo "Installation summary:"
