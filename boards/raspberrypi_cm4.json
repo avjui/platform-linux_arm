@@ -1,0 +1,19 @@
+{
+  "build": {
+    "extra_flags": "-DRASPBERRYPI -DRASPBERRYPI_CM4",
+    "f_cpu": "1500000000L",
+    "mcu": "bcm2711"
+  },
+  "frameworks": [
+    "wiringpi",
+    "lgpio",
+    "pigpio"
+  ],
+  "name": "Raspberry Pi Compute Module 4",
+  "upload": {
+    "maximum_ram_size": 8589934592,
+    "maximum_size": 8589934592
+  },
+  "url": "https://www.raspberrypi.com/products/compute-module-4/",
+  "vendor": "Raspberry Pi"
+}

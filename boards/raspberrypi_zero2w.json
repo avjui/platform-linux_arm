@@ -1,0 +1,19 @@
+{
+  "build": {
+    "extra_flags": "-DRASPBERRYPI -DRASPBERRYPI_ZERO2W",
+    "f_cpu": "1000000000L",
+    "mcu": "bcm2710"
+  },
+  "frameworks": [
+    "wiringpi",
+    "lgpio",
+    "pigpio"
+  ],
+  "name": "Raspberry Pi Zero 2 W",
+  "upload": {
+    "maximum_ram_size": 536870912,
+    "maximum_size": 536870912
+  },
+  "url": "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/",
+  "vendor": "Raspberry Pi"
+}

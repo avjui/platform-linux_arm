@@ -1,0 +1,17 @@
+{
+  "build": {
+    "extra_flags": "-DRASPBERRYPI -DRASPBERRYPI5",
+    "f_cpu": "2400000000L",
+    "mcu": "bcm2712"
+  },
+  "frameworks": [
+    "lgpio"
+  ],
+  "name": "Raspberry Pi 5",
+  "upload": {
+    "maximum_ram_size": 17179869184,
+    "maximum_size": 17179869184
+  },
+  "url": "https://www.raspberrypi.com/products/raspberry-pi-5/",
+  "vendor": "Raspberry Pi"
+}

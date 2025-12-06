@@ -1,0 +1,19 @@
+{
+  "build": {
+    "extra_flags": "-DORANGEPI -DORANGEPIZERO",
+    "f_cpu": "1200000000L",
+    "mcu": "allwinner_h2plus"
+  },
+  "frameworks": [
+    "wiringpi",
+    "lgpio",
+    "pigpio"
+  ],
+  "name": "Orange Pi Zero",
+  "upload": {
+    "maximum_ram_size": 536870912,
+    "maximum_size": 536870912
+  },
+  "url": "http://www.orangepi.org",
+  "vendor": "Xunlong"
+}
