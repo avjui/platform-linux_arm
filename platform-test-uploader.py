@@ -42,7 +42,7 @@ Security:
     - Requires SSH key or password authentication
     - Command injection protection via shlex.quote
 
-See REMOTE_TESTING.md for detailed documentation.
+See docs/REMOTE_TESTING.md for detailed documentation.
 """
 
 import os
