@@ -26,7 +26,10 @@ class Linux_armPlatform(PlatformBase):
     @property
     def packages(self):
         packages = PlatformBase.packages.fget(self)
-        if self._is_native() and "toolchain-gccarmlinuxgnueabi" in packages:
+        systype = get_systype()
+        # PlatformIO's toolchain package only works on macOS x86_64
+        # All other platforms use system-installed toolchains
+        if systype != "darwin_x86_64" and "toolchain-gccarmlinuxgnueabi" in packages:
             del packages['toolchain-gccarmlinuxgnueabi']
         return packages
 

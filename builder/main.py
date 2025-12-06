@@ -36,10 +36,19 @@ env.Replace(
     SIZEPRINTCMD='$SIZETOOL $SOURCES'
 )
 
-if get_systype() == "darwin_x86_64":
-    env.Replace(
-        _BINPREFIX="arm-linux-gnueabihf-"
-    )
+# Detect if we're cross-compiling (not native ARM Linux)
+systype = get_systype()
+is_native = "linux_arm" in systype or "linux_aarch64" in systype
+
+if not is_native:
+    # Cross-compilation to ARMv7 (32-bit ARM with hard-float)
+    env.Replace(_BINPREFIX="arm-linux-gnueabihf-")
+    print("Cross-compiling for ARM Linux (ARMv7)")
+    print("Using toolchain prefix: arm-linux-gnueabihf-")
+    print("Ensure toolchain is installed:")
+    print("  Linux:   sudo apt install gcc-arm-linux-gnueabihf")
+    print("  macOS:   brew install arm-linux-gnueabihf-binutils")
+    print("  Windows: Install ARM GNU Toolchain from ARM Developer site")
 
 #
 # Target: Build executable program
