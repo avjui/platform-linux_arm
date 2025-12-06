@@ -10,63 +10,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Nothing yet
 
-## [1.8.0] - 2025-11-15 - "The Quality Release"
+## [1.8.0] - 2025-11-15
 
-**This release focuses on code quality, testing, security, and developer experience improvements.**
+Code quality, testing, security, and developer experience improvements.
 
-**🎉 Highlights:**
-- **81 comprehensive unit tests** with 42% code coverage
-- **Type hints (PEP 484)** for better IDE support and type safety
-- **Configuration file support** for global defaults
-- **libgpiod cross-compilation** on Windows and macOS
-- **Security documentation** and vulnerability fixes
-- **Python code quality** improvements across the board
+Summary:
+- 81 unit tests with 42% code coverage
+- Type hints (PEP 484) for IDE support and type safety
+- Configuration file support for global defaults
+- libgpiod cross-compilation on Windows and macOS
+- Security documentation and vulnerability fixes
+- Python code quality improvements
 
 ---
 
 ### Added
 
-- **VSCode Integration**
+- VSCode Integration
   - Custom tasks for SSH monitoring (examples/vscode/tasks.json)
-  - Comprehensive VSCode integration guide (docs/VSCODE.md)
+  - VSCode integration guide (docs/VSCODE.md)
   - Workaround for PlatformIO GUI Monitor button limitation
   - Welcome message on first platform use with setup instructions
   - Updated example projects to include .vscode/tasks.json
-  - Prominent README notice for VSCode users
+  - README notice for VSCode users
 
-- **libgpiod Framework Cross-Compilation** (#78, #82, #86, #94)
+- libgpiod Framework Cross-Compilation (#78, #82, #86, #94)
   - Windows cross-compilation via MSYS2 (#82)
   - macOS cross-compilation support (#94)
   - Ubuntu cross-compilation from source (#86)
-  - Comprehensive build scripts and documentation
+  - Build scripts and documentation
 
-- **Configuration File Support** (#73, #97)
+- Configuration File Support (#73, #97)
   - Global configuration: `~/.platformio/.platform-linux_arm.ini`
   - Project-local configuration: `./.platform-linux_arm.ini`
   - Configurable defaults for upload, test, and SSH settings
   - Automatic configuration discovery and merging
 
-- **Comprehensive Unit Testing** (#71)
+- Unit Testing (#71)
   - 81 unit tests using pytest framework
   - 42% code coverage (platform_constants: 100%, ssh_utils: 98%)
   - Automated testing in CI/CD (Python 3.8-3.12)
   - Developer guide (DEVELOPER.md) with testing instructions
   - Coverage reporting with HTML and XML output
 
-- **Type Hints (PEP 484)** (#65)
+- Type Hints (PEP 484) (#65)
   - Type annotations for platform_constants.py (100% coverage)
   - Type hints for platform.py core methods
   - mypy configuration for static type checking
   - CI/CD integration with automated mypy checks
   - Improved IDE autocomplete and type safety
 
-- **Security Documentation** (#91)
+- Security Documentation (#91)
   - Phase 1 security documentation complete
   - Threat model and risk assessment
   - Security controls and mitigation strategies
   - Best practices guide for secure deployments
 
-- **Hardware Test Matrix** (#79)
+- Hardware Test Matrix (#79)
   - Comprehensive board × framework compatibility matrix
   - Architecture support documentation (32-bit/64-bit)
   - Host OS × target board testing matrix
@@ -129,29 +129,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Built library caching (libgpiod, lgpio)
   - macOS Homebrew toolchain caching
 
-## [1.7.0] - 2025-11-13 - "The Modernization Release"
+## [1.7.0] - 2025-11-13
 
-**This is a major modernization release forked from the original platformio/platform-linux_arm repository (last updated May 2022, abandoned for 3.5 years).**
+Major modernization release forked from platformio/platform-linux_arm (last updated May 2022).
 
-**🎉 Highlights:**
-- **First PlatformIO platform with Raspberry Pi 5 support**
-- **Modern lgpio framework** supporting all Raspberry Pi models (1-5)
-- **Remote development workflows** (deployment, debugging, testing)
-- **15 comprehensive examples** (increased from 5)
-- **10 board definitions** (increased from 4)
-- **Professional development tools** with complete documentation
+Summary:
+- Raspberry Pi 5 support
+- lgpio framework supporting all Raspberry Pi models (1-5)
+- Remote development workflows (deployment, debugging, testing)
+- 15 examples (increased from 5)
+- 10 board definitions (increased from 4)
+- Development tools and documentation
 
-**Modernization Scope:**
-- 110+ commits over 5 days
+Scope:
+- 110+ commits
 - ~15,000 lines of code added/modified
 - ~10,000 lines of documentation added
-- 30+ major features implemented
-- Complete CI/CD infrastructure
+- 30+ features implemented
+- CI/CD infrastructure
 
 ---
 
 ### Added
-- **Custom upload/deployment protocol support** for automated binary deployment to remote targets (#36)
+- Custom upload/deployment protocol support for automated binary deployment to remote targets (#36)
   - SCP upload protocol (secure copy via SSH)
   - Rsync upload protocol (efficient incremental transfer)
   - SSH upload protocol (alternative transfer method)
@@ -161,21 +161,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Flexible target specification formats (`user@host:/path`)
   - Complete upload documentation (`docs/UPLOAD.md`)
   - Remote deployment example project (`examples/remote-deployment/`)
-- **Remote debugging support** via GDB over SSH for IDE-integrated debugging (#35)
+- Remote debugging support via GDB over SSH for IDE-integrated debugging (#35)
   - gdbserver-ssh debug tool (automatic SSH tunnel setup)
   - gdb-remote debug tool (manual TCP debugging)
   - Support for remote debugging on Raspberry Pi and ARM SBC targets
   - VS Code integration with launch configurations
   - Complete debugging documentation (`docs/DEBUGGING.md`)
   - Remote debugging example project (`examples/remote-debugging/`)
-- **Remote test execution** via SSH for automated hardware testing (#37)
+- Remote test execution via SSH for automated hardware testing (#37)
   - Cross-compiled test binaries deployed and executed on target hardware
   - Real-time test output streaming from remote device
   - Unity test framework integration
   - CI/CD pipeline support for hardware-in-the-loop testing
-  - Complete testing documentation (`REMOTE_TESTING.md`)
+  - Complete testing documentation (`docs/REMOTE_TESTING.md`)
   - Remote testing example project (`examples/remote-testing/`)
-- **Hardware PWM support** via Linux PWM subsystem (sysfs) for lgpio framework (#34)
+- Hardware PWM support via Linux PWM subsystem (sysfs) for lgpio framework (#34)
   - Complete PWM HAL library (`framework-lgpio/pwm-hal.c`, `framework-lgpio/pwm-hal.h`)
   - Core API: `pwm_init()`, `pwm_write()`, `pwm_deinit()`
   - Extended API: `pwm_set_frequency()`, `pwm_set_polarity()`, `pwm_get_status()`
@@ -183,18 +183,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - PWM permission setup scripts and systemd service
   - Comprehensive PWM setup guide (`docs/PWM_SETUP.md`)
   - PWM examples: LED fading (`examples/lgpio-pwm-fade/`) and servo control (`examples/lgpio-pwm-servo/`)
-- **Orange Pi Zero board support** (Allwinner H2+/H3 SoC) (#29)
+- Orange Pi Zero board support (Allwinner H2+/H3 SoC) (#29)
   - Board definition for Orange Pi Zero with 256MB/512MB RAM variants
   - Compatible with lgpio, pigpio, and wiringpi frameworks
   - Orange Pi GPIO example (`examples/orangepi-lgpio-blink/`)
-- **Additional lgpio framework examples** for hardware communication
+- Additional lgpio framework examples for hardware communication
   - SPI communication with MCP3008 ADC (`examples/lgpio-spi-adc/`) (#40)
   - I2C sensor communication with BME280 (`examples/lgpio-i2c-sensor/`) (#39)
-- **Bare-metal serial communication example** (`examples/baremetal-uart/`) (#41)
+- Bare-metal serial communication example (`examples/baremetal-uart/`) (#41)
   - UART/serial communication using POSIX termios API
   - Bidirectional communication with echo test and interactive modes
   - Comprehensive serial port configuration examples
-- **Multi-threading example** with producer-consumer pattern (`examples/baremetal-threads/`) (#42)
+- Multi-threading example with producer-consumer pattern (`examples/baremetal-threads/`) (#42)
   - POSIX threads (pthreads) for concurrent execution
   - Thread-safe circular queue with mutex locks and condition variables
   - 2 producer threads and 3 consumer threads
