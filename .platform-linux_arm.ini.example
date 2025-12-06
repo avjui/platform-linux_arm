@@ -1,0 +1,118 @@
+# Example Platform Configuration File for Linux ARM Platform
+#
+# This file demonstrates how to set global defaults for the platform-linux_arm
+# PlatformIO platform, reducing configuration duplication across projects.
+#
+# Installation:
+#   Global (all projects):
+#     mkdir -p ~/.platformio
+#     cp .platform-linux_arm.ini.example ~/.platformio/.platform-linux_arm.ini
+#     nano ~/.platformio/.platform-linux_arm.ini  # Edit as needed
+#
+#   Project-local (single project):
+#     cp .platform-linux_arm.ini.example .platform-linux_arm.ini
+#     nano .platform-linux_arm.ini  # Edit as needed
+#
+# Configuration Priority:
+#   platformio.ini > project-local config > global config > hard-coded defaults
+#
+# Note: Values in platformio.ini always override config file defaults.
+
+[defaults]
+# ============================================================================
+# SSH Connection Defaults
+# ============================================================================
+
+# Default SSH username for remote connections
+# Used for upload and test operations when not specified in platformio.ini
+upload_user = pi
+
+# Default SSH port
+# Standard SSH port is 22, change if using custom port
+upload_ssh_port = 22
+test_ssh_port = 22
+
+# Default SSH key path (optional)
+# Uncomment and set path to use SSH key authentication by default
+# upload_ssh_key = ~/.ssh/id_rsa
+# test_ssh_key = ~/.ssh/id_rsa
+
+
+# ============================================================================
+# Upload Configuration
+# ============================================================================
+
+# Default remote path for uploaded binaries
+upload_path = /tmp/program
+
+# Upload timeout (seconds)
+# Time to wait for upload to complete before aborting
+upload_timeout = 300
+
+# Upload flags for rsync (optional)
+# Default: -avz (archive, verbose, compress)
+upload_flags = -avz
+
+# Remote execution timeout after upload (seconds)
+# Used when upload_run_after = true
+upload_run_timeout = 300
+
+
+# ============================================================================
+# Test Configuration
+# ============================================================================
+
+# Default username for test operations
+# Falls back to upload_user if not specified
+test_username = pi
+
+# Default remote path for test binaries
+test_path = /tmp/test_program
+
+# Test binary upload timeout (seconds)
+test_upload_timeout = 300
+
+# Test execution timeout (seconds)
+# Maximum time to wait for tests to complete
+test_timeout = 600
+
+
+# ============================================================================
+# Advanced Options
+# ============================================================================
+
+# Custom upload run command (optional)
+# Uncomment to run a custom command after upload instead of just executing the binary
+# upload_run_command = sudo /tmp/program
+
+# Debug SSH port (optional)
+# debug_ssh_port = 22
+
+# Debug SSH key (optional)
+# debug_ssh_key = ~/.ssh/id_rsa
+
+
+# ============================================================================
+# Example Usage Scenarios
+# ============================================================================
+
+# Scenario 1: Development with custom SSH port
+# If your Raspberry Pi uses a non-standard SSH port:
+#   upload_ssh_port = 2222
+#   test_ssh_port = 2222
+
+# Scenario 2: Multiple devices with different users
+# Use project-local config (./.platform-linux_arm.ini) in each project:
+#   Project A: upload_user = pi
+#   Project B: upload_user = admin
+
+# Scenario 3: CI/CD with longer timeouts
+# For slower connections or large binaries:
+#   upload_timeout = 600
+#   test_timeout = 1200
+#   test_upload_timeout = 600
+
+# Scenario 4: SSH key authentication
+# Use SSH keys instead of passwords:
+#   upload_ssh_key = ~/.ssh/raspberry_pi_key
+#   test_ssh_key = ~/.ssh/raspberry_pi_key

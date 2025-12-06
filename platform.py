@@ -140,6 +140,8 @@ class Linux_armPlatform(PlatformBase):
         super().__init__(manifest_path)
         # Load platform configuration (global and project-local)
         self._config = get_platform_config()
+        # Show welcome message on first use
+        self._show_welcome_if_needed()
 
     def _get_config_default(self, key: str, fallback_default: Any) -> Any:
         """
@@ -162,6 +164,43 @@ class Linux_armPlatform(PlatformBase):
             with env.GetProjectOption() calls.
         """
         return self._config.get(key, fallback_default)
+
+    def _show_welcome_if_needed(self) -> None:
+        """
+        Show welcome message on first platform use.
+
+        Creates a marker file to track first-time use.
+        Displays important information about VSCode integration.
+        """
+        import os
+        from pathlib import Path
+
+        # Marker file in platform directory
+        platform_dir = os.path.dirname(os.path.realpath(__file__))
+        marker_file = os.path.join(platform_dir, ".welcome_shown")
+
+        if os.path.exists(marker_file):
+            return  # Already shown
+
+        # Create marker file
+        try:
+            Path(marker_file).touch()
+        except Exception:
+            pass  # Ignore errors (e.g., permissions)
+
+        # Show welcome message
+        print("\n" + "=" * 70)
+        print("  Welcome to Linux ARM Platform!")
+        print("=" * 70)
+        print("\n[!] Important for VS Code Users:")
+        print("    The PlatformIO GUI Monitor button doesn't work with this platform.")
+        print("    Copy examples/vscode/tasks.json to your project's .vscode/ folder.")
+        print("    See: https://github.com/sfo2001/platform-linux_arm/blob/develop/docs/VSCODE.md")
+        print("\n[i] Documentation:")
+        print("    - Remote Deployment: docs/UPLOAD.md")
+        print("    - Remote Testing:    docs/TESTING.md")
+        print("    - VSCode Setup:      docs/VSCODE.md")
+        print("\n" + "=" * 70 + "\n")
 
     @staticmethod
     def _is_native() -> bool:
