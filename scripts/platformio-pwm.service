@@ -1,0 +1,25 @@
+[Unit]
+Description=PlatformIO Linux ARM PWM Permissions Setup
+Documentation=https://github.com/sfo2001/platform-linux_arm
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# Run the PWM permissions setup script
+# Update ExecStart path if platform is installed in different location
+ExecStart=/bin/bash -c 'if [ -f /usr/local/platform-linux_arm/scripts/setup-pwm-perms.sh ]; then /usr/local/platform-linux_arm/scripts/setup-pwm-perms.sh; elif [ -f /opt/platform-linux_arm/scripts/setup-pwm-perms.sh ]; then /opt/platform-linux_arm/scripts/setup-pwm-perms.sh; else echo "WARNING: setup-pwm-perms.sh not found. Please update service file with correct path."; exit 1; fi'
+
+# Success exit codes (0 = success)
+SuccessExitStatus=0
+
+# Restart behavior
+Restart=no
+
+# Standard output to journal
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

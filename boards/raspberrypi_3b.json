@@ -5,7 +5,9 @@
     "mcu": "bcm2837"
   },
   "frameworks": [
-    "wiringpi"
+    "wiringpi",
+    "lgpio",
+    "pigpio"
   ],
   "name": "Raspberry Pi 3 Model B",
   "upload": {

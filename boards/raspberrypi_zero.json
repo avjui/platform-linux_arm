@@ -5,7 +5,9 @@
     "mcu": "bcm2835"
   },
   "frameworks": [
-    "wiringpi"
+    "wiringpi",
+    "lgpio",
+    "pigpio"
   ],
   "name": "Raspberry Pi Zero",
   "upload": {

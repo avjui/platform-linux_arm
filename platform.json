@@ -24,6 +24,18 @@
       "description": "WiringPi is a GPIO access library written in C for the BCM2835 used in the Raspberry Pi. It's designed to be familiar to people who have used the Arduino 'wiring' system",
       "url": "http://wiringpi.com",
       "title": "WiringPi"
+    },
+    "lgpio": {
+      "script": "builder/frameworks/lgpio.py",
+      "description": "lgpio is a modern C library for Linux GPIO access, supporting all Raspberry Pi models including Pi 5 with the RP1 I/O controller",
+      "url": "http://abyz.me.uk/lg/index.html",
+      "title": "lgpio"
+    },
+    "pigpio": {
+      "script": "builder/frameworks/pigpio.py",
+      "description": "pigpio is a feature-rich C library for Raspberry Pi GPIO control with microsecond timing, PWM, and servo support (Pi 1-4, not Pi 5 compatible)",
+      "url": "http://abyz.me.uk/rpi/pigpio/",
+      "title": "pigpio"
     }
   },
   "packages": {

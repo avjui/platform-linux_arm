@@ -5,7 +5,9 @@
     "mcu": "bcm2711"
   },
   "frameworks": [
-    "wiringpi"
+    "wiringpi",
+    "lgpio",
+    "pigpio"
   ],
   "name": "Raspberry Pi 4 Model B",
   "upload": {

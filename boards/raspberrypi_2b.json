@@ -5,7 +5,9 @@
     "mcu": "bcm2836"
   },
   "frameworks": [
-    "wiringpi"
+    "wiringpi",
+    "lgpio",
+    "pigpio"
   ],
   "name": "Raspberry Pi 2 Model B",
   "upload": {
