@@ -1,15 +1,29 @@
 *.pyc
+__pycache__/
+.welcome_shown
 
 # Python virtual environments
 venv/
 env/
 .venv/
 
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+coverage.xml
+*.cover
+
 # PlatformIO
 .pio/
 .pioenvs/
 .piolibdeps/
 
+# Sphinx documentation
+docs/_build/
+
 # IDE
 .vscode/
+!examples/**/.vscode/
 .idea/

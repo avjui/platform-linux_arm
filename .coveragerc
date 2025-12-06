@@ -1,0 +1,61 @@
+[run]
+# Measure branch coverage
+branch = True
+
+# Source code directories to measure
+source = .
+
+# Omit these files/directories from coverage
+omit =
+    # Virtual environments
+    venv/*
+    .venv/*
+    env/*
+    # Build directories
+    .pio/*
+    build/*
+    dist/*
+    # Tests themselves
+    tests/*
+    # Setup/configuration files
+    setup.py
+    # Examples
+    examples/*
+    # Documentation
+    docs/*
+    # Generated files
+    *.pyc
+    __pycache__/*
+
+[report]
+# Show missing line numbers in report
+show_missing = True
+
+# Precision for coverage percentage
+precision = 2
+
+# Lines to exclude from coverage (e.g., debug code, type checking)
+exclude_lines =
+    # Standard pragma
+    pragma: no cover
+    # Don't complain about missing debug code
+    def __repr__
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+    # Don't complain if non-runnable code isn't run
+    if __name__ == .__main__.:
+    # Type checking blocks
+    if TYPE_CHECKING:
+    # Abstract methods
+    @abstractmethod
+    # Ellipsis for protocols/stubs
+    \.\.\.
+
+[html]
+# Directory for HTML coverage report
+directory = htmlcov
+
+[xml]
+# Output file for XML coverage report (for CI/CD)
+output = coverage.xml
