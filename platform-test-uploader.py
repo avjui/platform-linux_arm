@@ -21,13 +21,10 @@ executes them, and streams the output back to PlatformIO's test framework.
 """
 
 import os
-import shlex
 import shutil
 import subprocess
 import sys
 import time
-
-from ssh_utils import SSHConnectionConfig, SSHCommandBuilder, parse_upload_port
 
 
 class RemoteTestUploader:
@@ -68,19 +65,26 @@ class RemoteTestUploader:
                 "  upload_port = user@hostname:/path/to/test_binary"
             )
 
-        # Get defaults from project options
-        default_user = self.env.GetProjectOption("test_username", "pi")
-        default_path = self.env.GetProjectOption("test_path", "/tmp/test_program")
+        # Default values
+        self.user = self.env.GetProjectOption("test_username", "pi")
+        self.remote_path = self.env.GetProjectOption("test_path", "/tmp/test_program")
 
-        # Use shared parser
-        try:
-            self.user, self.host, self.remote_path = parse_upload_port(
-                self.upload_port,
-                default_user=default_user,
-                default_path=default_path
-            )
-        except ValueError as e:
-            raise Exception(str(e))
+        # Parse user@host:path format
+        upload_port = self.upload_port
+
+        # Extract user if specified
+        if "@" in upload_port:
+            user_part, host_part = upload_port.split("@", 1)
+            self.user = user_part
+        else:
+            host_part = upload_port
+
+        # Extract host and path
+        if ":" in host_part:
+            self.host, path_part = host_part.split(":", 1)
+            self.remote_path = path_part
+        else:
+            self.host = host_part
 
         # Get SSH configuration
         self.ssh_port = self.env.GetProjectOption("test_ssh_port", "22")
@@ -108,39 +112,46 @@ class RemoteTestUploader:
 
     def build_ssh_command(self, remote_command=None):
         """Build SSH command with proper authentication."""
-        # Create SSH config
-        try:
-            config = SSHConnectionConfig(
-                user=self.user,
-                host=self.host,
-                port=self.ssh_port,
-                key=self.ssh_key,
-                strict_host_check=False
-            )
-        except (ValueError, FileNotFoundError) as e:
-            raise Exception(str(e))
+        cmd = ["ssh"]
+        cmd.extend(["-p", str(self.ssh_port)])
 
-        # Build SSH command using shared builder
-        builder = SSHCommandBuilder(config)
-        return builder.build_ssh_command(remote_command)
+        if self.ssh_key:
+            key_path = os.path.expanduser(self.ssh_key)
+            if not os.path.exists(key_path):
+                raise Exception(f"SSH key file not found: {key_path}")
+            cmd.extend(["-i", key_path])
+
+        # Disable strict host key checking for automated testing
+        # (can be overridden with custom SSH config)
+        cmd.extend(["-o", "StrictHostKeyChecking=no"])
+        cmd.extend(["-o", "UserKnownHostsFile=/dev/null"])
+        cmd.extend(["-o", "LogLevel=ERROR"])
+
+        cmd.append(f"{self.user}@{self.host}")
+
+        if remote_command:
+            cmd.append(remote_command)
+
+        return cmd
 
     def build_scp_command(self, local_file, remote_file):
         """Build SCP command for file upload."""
-        # Create SSH config
-        try:
-            config = SSHConnectionConfig(
-                user=self.user,
-                host=self.host,
-                port=self.ssh_port,
-                key=self.ssh_key,
-                strict_host_check=False
-            )
-        except (ValueError, FileNotFoundError) as e:
-            raise Exception(str(e))
+        cmd = ["scp"]
+        cmd.extend(["-P", str(self.ssh_port)])
 
-        # Build SCP command using shared builder
-        builder = SSHCommandBuilder(config)
-        return builder.build_scp_command(local_file, remote_file)
+        if self.ssh_key:
+            key_path = os.path.expanduser(self.ssh_key)
+            cmd.extend(["-i", key_path])
+
+        # Disable strict host key checking
+        cmd.extend(["-o", "StrictHostKeyChecking=no"])
+        cmd.extend(["-o", "UserKnownHostsFile=/dev/null"])
+        cmd.extend(["-o", "LogLevel=ERROR"])
+
+        cmd.append(local_file)
+        cmd.append(f"{self.user}@{self.host}:{remote_file}")
+
+        return cmd
 
     def upload_test_binary(self):
         """Upload test binary to remote target via SCP."""
@@ -148,16 +159,9 @@ class RemoteTestUploader:
 
         print(f"\nUploading test binary to {self.user}@{self.host}:{self.remote_path}")
 
-        # Upload the binary with timeout protection
-        upload_timeout = self.env.GetProjectOption("test_upload_timeout", 300)
+        # Upload the binary
         cmd = self.build_scp_command(source_file, self.remote_path)
-        try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=upload_timeout)
-        except subprocess.TimeoutExpired:
-            raise Exception(
-                f"Test upload timeout after {upload_timeout} seconds. "
-                "Increase timeout with 'test_upload_timeout' option in platformio.ini"
-            )
+        result = subprocess.run(cmd, capture_output=True, text=True)
 
         if result.returncode != 0:
             raise Exception(
@@ -166,12 +170,9 @@ class RemoteTestUploader:
                 f"Error: {result.stderr}"
             )
 
-        # Make it executable (use shlex.quote to prevent command injection)
-        chmod_cmd = self.build_ssh_command(f"chmod +x {shlex.quote(self.remote_path)}")
-        try:
-            result = subprocess.run(chmod_cmd, capture_output=True, text=True, timeout=30)
-        except subprocess.TimeoutExpired:
-            raise Exception("Timeout while setting executable permission on remote test binary")
+        # Make it executable
+        chmod_cmd = self.build_ssh_command(f"chmod +x {self.remote_path}")
+        result = subprocess.run(chmod_cmd, capture_output=True, text=True)
 
         if result.returncode != 0:
             raise Exception(
@@ -191,15 +192,11 @@ class RemoteTestUploader:
 
         # Build command to execute the test
         # We want to capture both stdout and stderr, and get the exit code
-        # Use shlex.quote to prevent command injection via remote_path
-        test_command = f"{shlex.quote(self.remote_path)}; echo \"__EXIT_CODE__:$?\""
+        test_command = f"{self.remote_path}; echo \"__EXIT_CODE__:$?\""
 
         cmd = self.build_ssh_command(test_command)
 
-        # Get test execution timeout
-        test_timeout = self.env.GetProjectOption("test_timeout", 600)
-
-        # Execute and stream output in real-time with timeout protection
+        # Execute and stream output in real-time
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
@@ -212,35 +209,24 @@ class RemoteTestUploader:
         exit_code = 0
         output_lines = []
 
-        try:
-            # Stream output line by line
-            for line in iter(process.stdout.readline, ""):
-                if not line:
-                    break
+        # Stream output line by line
+        for line in iter(process.stdout.readline, ""):
+            if not line:
+                break
 
-                # Check for exit code marker
-                if "__EXIT_CODE__:" in line:
-                    try:
-                        exit_code = int(line.split("__EXIT_CODE__:")[1].strip())
-                    except (IndexError, ValueError):
-                        pass
-                else:
-                    # Print to console (PlatformIO captures this)
-                    print(line, end="")
-                    output_lines.append(line)
+            # Check for exit code marker
+            if "__EXIT_CODE__:" in line:
+                try:
+                    exit_code = int(line.split("__EXIT_CODE__:")[1].strip())
+                except (IndexError, ValueError):
+                    pass
+            else:
+                # Print to console (PlatformIO captures this)
+                print(line, end="")
+                output_lines.append(line)
 
-            # Wait for process to complete with timeout
-            process.wait(timeout=test_timeout)
-        except subprocess.TimeoutExpired:
-            # Kill the process if it times out
-            process.kill()
-            process.wait()
-            raise Exception(
-                f"Test execution timeout after {test_timeout} seconds. "
-                "Increase timeout with 'test_timeout' option in platformio.ini"
-            )
-        finally:
-            print("=" * 80)
+        process.wait()
+        print("=" * 80)
 
         return exit_code
 
@@ -260,9 +246,9 @@ class RemoteTestUploader:
             exit_code = self.execute_test_binary()
 
             if exit_code == 0:
-                print("\n✓ Tests PASSED")
+                print("\nTests PASSED")
             else:
-                print(f"\n✗ Tests FAILED (exit code: {exit_code})")
+                print(f"\nTests FAILED (exit code: {exit_code})")
 
             return exit_code
 

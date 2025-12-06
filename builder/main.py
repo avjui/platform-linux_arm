@@ -96,6 +96,23 @@ target_upload = env.Alias("upload", target_bin, _upload_handler)
 AlwaysBuild(target_upload)
 
 #
+# Target: Upload and execute tests on remote target
+#
+
+def _test_upload_handler(target, source, env):
+    """Handler for test upload target - delegates to platform.on_test_upload()"""
+    platform = env.PioPlatform()
+    # Check if platform has on_test_upload method
+    if hasattr(platform, 'on_test_upload'):
+        return platform.on_test_upload(target, source, env)
+    else:
+        # Fallback to regular upload if test upload not implemented
+        return platform.on_upload(target, source, env)
+
+# Register the test upload handler
+env.Replace(UPLOADTESTCMD=_test_upload_handler)
+
+#
 # Default targets
 #
 
