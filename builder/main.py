@@ -13,14 +13,61 @@
 # limitations under the License.
 
 """
-    Builder for Linux ARM
+SCons Build Script for Linux ARM Platform.
+
+This module configures the build environment for ARM Linux targets,
+supporting both native compilation on ARM Linux and cross-compilation
+from x86_64 hosts.
+
+Features:
+    - Automatic toolchain detection (native vs cross-compilation)
+    - Architecture-specific toolchain selection (ARMv7 vs AArch64)
+    - Build targets: program binary, size calculation, upload, test upload
+    - Integration with PlatformIO platform class for uploads and testing
+
+Build Targets:
+    - Default: Build program binary
+    - size: Calculate and display binary size
+    - upload: Upload binary to remote target (delegates to platform.on_upload)
+    - test upload: Upload and execute tests (delegates to platform.on_test_upload)
+
+Toolchain Selection:
+    - Native ARM Linux: Uses system toolchain (no prefix)
+    - Cross-compilation ARMv7: Uses arm-linux-gnueabihf- prefix
+    - Cross-compilation AArch64: Uses aarch64-linux-gnu- prefix
+
+Examples:
+    Build program:
+        $ pio run
+
+    Build and display size:
+        $ pio run --target size
+
+    Build and upload:
+        $ pio run --target upload
+
+Author: PlatformIO
+License: Apache 2.0
 """
+
+import sys
+import os
 
 from SCons.Script import AlwaysBuild, Default, DefaultEnvironment
 
 from platformio.util import get_systype
 
 env = DefaultEnvironment()
+
+# Add platform directory to sys.path for importing platform_constants
+# Use env.PioPlatform().get_dir() instead of __file__ because __file__
+# is not defined in SCons execution context (scripts are executed via exec())
+platform_dir = env.PioPlatform().get_dir()
+if platform_dir not in sys.path:
+    sys.path.insert(0, platform_dir)
+
+# Import platform_constants after sys.path is configured
+from platform_constants import Architecture, SystemType, ToolchainPrefix
 
 env.Replace(
     _BINPREFIX="",
@@ -38,12 +85,12 @@ env.Replace(
 
 # Detect if we're cross-compiling (not native ARM Linux)
 systype = get_systype()
-is_native = "linux_arm" in systype or "linux_aarch64" in systype
+is_native = SystemType.LINUX_ARM in systype or SystemType.LINUX_AARCH64 in systype
 
 if not is_native:
     # Detect target architecture from board configuration
     board = env.BoardConfig()
-    target_arch = board.get("build.arch", "armv7")  # Default to 32-bit for backward compatibility
+    target_arch = board.get("build.arch", Architecture.ARMV7)  # Default to 32-bit for backward compatibility
 
     # Check if user explicitly set architecture via board_build.arch in platformio.ini
     # This takes precedence over board definition
@@ -51,8 +98,8 @@ if not is_native:
         target_arch = env.GetProjectOption("board_build.arch")
 
     # Pi 4/5 with 64-bit OS use aarch64 architecture
-    if target_arch == "aarch64":
-        env.Replace(_BINPREFIX="aarch64-linux-gnu-")
+    if target_arch == Architecture.AARCH64:
+        env.Replace(_BINPREFIX=ToolchainPrefix.AARCH64)
         print("Cross-compiling for ARM Linux (AArch64/ARMv8 64-bit)")
         print("Using toolchain prefix: aarch64-linux-gnu-")
         print("Ensure toolchain is installed:")
@@ -61,7 +108,7 @@ if not is_native:
         print("           brew install aarch64-unknown-linux-gnu")
     else:
         # Default: 32-bit ARMv7 (backward compatible)
-        env.Replace(_BINPREFIX="arm-linux-gnueabihf-")
+        env.Replace(_BINPREFIX=ToolchainPrefix.ARMV7)
         print("Cross-compiling for ARM Linux (ARMv7 32-bit)")
         print("Using toolchain prefix: arm-linux-gnueabihf-")
         print("Ensure toolchain is installed:")
@@ -87,8 +134,24 @@ AlwaysBuild(target_size)
 # Target: Upload program to remote target
 #
 
-def _upload_handler(target, source, env):
-    """Handler for upload target - delegates to platform.on_upload()"""
+def _upload_handler(target, source, env) -> int:
+    """
+    Handle upload target.
+
+    Delegates to platform.on_upload() for protocol-specific upload logic
+    (SCP, rsync, SSH, or manual).
+
+    Args:
+        target: Build target.
+        source: List of source files (binary path).
+        env: SCons environment object.
+
+    Returns:
+        int: Exit code from upload operation.
+
+    See Also:
+        - Linux_armPlatform.on_upload: Platform upload implementation
+    """
     platform = env.PioPlatform()
     return platform.on_upload(target, source, env)
 
@@ -99,8 +162,25 @@ AlwaysBuild(target_upload)
 # Target: Upload and execute tests on remote target
 #
 
-def _test_upload_handler(target, source, env):
-    """Handler for test upload target - delegates to platform.on_test_upload()"""
+def _test_upload_handler(target, source, env) -> int:
+    """
+    Handle test upload target.
+
+    Delegates to platform.on_test_upload() for remote test execution
+    via SSH, or falls back to regular upload if test upload is not implemented.
+
+    Args:
+        target: Build target.
+        source: List of source files (test binary path).
+        env: SCons environment object.
+
+    Returns:
+        int: Exit code from test execution.
+
+    See Also:
+        - Linux_armPlatform.on_test_upload: Platform test upload implementation
+        - RemoteTestUploader: SSH test uploader implementation
+    """
     platform = env.PioPlatform()
     # Check if platform has on_test_upload method
     if hasattr(platform, 'on_test_upload'):
