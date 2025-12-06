@@ -121,13 +121,13 @@ echo ""
 # Run autogen.sh to generate configure script
 # Note: autogen.sh will check for libtool and fail with clear error if missing
 # --enable-tools=yes: Build command-line tools (gpiodetect, gpioinfo, etc.)
-# --enable-bindings-cxx: Build C++ bindings (optional, but often useful)
+# --disable-bindings-cxx: Disable C++ bindings (ARM cross-compiler C++ stdlib incomplete on Windows)
 # --prefix: Installation directory
 # --host: Target architecture for cross-compilation
 # CC/CXX: Explicitly set cross-compiler
 ./autogen.sh \
     --enable-tools=yes \
-    --enable-bindings-cxx \
+    --disable-bindings-cxx \
     --prefix="$INSTALL_DIR" \
     --host="$HOST_TRIPLE" \
     CC="${CROSS_PREFIX}gcc" \
