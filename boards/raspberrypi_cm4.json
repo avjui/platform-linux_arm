@@ -17,5 +17,24 @@
     "maximum_size": 8589934592
   },
   "url": "https://www.raspberrypi.com/products/compute-module-4/",
-  "vendor": "Raspberry Pi"
+  "vendor": "Raspberry Pi",
+  "debug": {
+    "default_tool": "gdbserver-ssh",
+    "tools": {
+      "gdbserver-ssh": {
+        "server": {
+          "package": null,
+          "executable": null,
+          "arguments": []
+        }
+      },
+      "gdb-remote": {
+        "server": {
+          "package": null,
+          "executable": null,
+          "arguments": []
+        }
+      }
+    }
+  }
 }

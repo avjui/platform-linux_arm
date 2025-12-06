@@ -20,9 +20,6 @@ import sys
 from platformio import exception
 from platformio.public import PlatformBase, get_systype
 
-# Import test uploader
-from platformio.public import load_build_script
-
 
 class Linux_armPlatform(PlatformBase):
 
@@ -537,48 +534,3 @@ class Linux_armPlatform(PlatformBase):
 
         board.manifest["debug"] = debug
         return board
-
-    def on_test_upload(self, target, source, env):
-        """
-        Custom test upload handler for Linux ARM platform.
-        Uploads test binaries to remote target via SSH and executes them.
-        """
-        test_transport = env.GetProjectOption("test_transport", "ssh")
-
-        if test_transport == "ssh":
-            # Load and execute the SSH test uploader
-            uploader_path = os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                "platform-test-uploader.py"
-            )
-
-            # Import the uploader module
-            import importlib.util
-            spec = importlib.util.spec_from_file_location("test_uploader", uploader_path)
-            uploader_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(uploader_module)
-
-            # Execute the upload_test function
-            return uploader_module.upload_test(target, source, env)
-
-        elif test_transport == "manual":
-            print("\n" + "="*60)
-            print("MANUAL TEST EXECUTION REQUIRED")
-            print("="*60)
-            print("\nCompiled test binary location:")
-            print(f"  {source[0]}")
-            print("\nTo run tests on your target device:")
-            print(f"  1. Upload the binary: scp {source[0]} user@host:/path/to/test")
-            print(f"  2. Make it executable: ssh user@host 'chmod +x /path/to/test'")
-            print(f"  3. Run the tests: ssh user@host '/path/to/test'")
-            print("\nTo configure automatic test execution, add to platformio.ini:")
-            print("  test_transport = ssh")
-            print("  test_port = user@hostname:/path/to/test")
-            print("="*60 + "\n")
-            return 0
-
-        else:
-            raise exception.PlatformioException(
-                f"Unknown test_transport '{test_transport}'. "
-                "Supported transports: ssh, manual"
-            )

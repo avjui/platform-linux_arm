@@ -8,7 +8,6 @@ Linux ARM is a Unix-like and mostly POSIX-compliant computer operating system (O
 - Cross-compilation support from Linux x86_64, macOS (Intel/ARM), and Windows
 - Native compilation on ARM Linux systems
 - **Automated deployment** to remote targets via SCP, rsync, or SSH
-- **Remote test execution** with automated SSH deployment and real-time results
 - **Remote debugging** with GDB/gdbserver over SSH (IDE-integrated)
 - Support for Raspberry Pi 1-5, Pi 400, Compute Module 4, and Zero/Zero 2W
 - Support for Orange Pi Zero (Allwinner H2+/H3)
@@ -310,7 +309,7 @@ The platform supports **IDE-integrated remote debugging** using GDB/gdbserver ov
 ### Features
 
 - **SSH-tunneled debugging** - Secure connection using existing SSH authentication
-- **IDE integration** - Works with VS Code, CLion, and other PlatformIO-compatible IDEs (see [docs/VSCODE.md](docs/VSCODE.md))
+- **IDE integration** - Works with VS Code, CLion, and other PlatformIO-compatible IDEs
 - **Automatic setup** - Platform handles gdbserver connection and symbol loading
 - **Architecture support** - Automatic GDB selection for 32-bit (ARMv7) and 64-bit (AArch64)
 
@@ -377,87 +376,9 @@ pio debug
 
 ### See Also
 
-- **VS Code Integration Guide:** [`docs/VSCODE.md`](docs/VSCODE.md) - Complete VS Code setup, IntelliSense, debugging, and troubleshooting
-- **Debugging Guide:** [`docs/DEBUGGING.md`](docs/DEBUGGING.md) - Comprehensive remote debugging reference
-- **Example Project:** [`examples/remote-debugging/`](examples/remote-debugging/) - Working debugging example with 7+ scenarios
-- **PlatformIO Debug Docs:** https://docs.platformio.org/en/latest/plus/debugging.html
-
-## Remote Test Execution
-
-The platform supports **automated remote test execution** on ARM Linux targets. Tests are cross-compiled on your development machine, deployed via SSH, executed on the target hardware, and results are streamed back in real-time.
-
-### Quick Start
-
-1. **Configure test transport** in `platformio.ini`:
-   ```ini
-   [env:raspberrypi_3b]
-   platform = linux_arm
-   board = raspberrypi_3b
-
-   ; Upload configuration (reused for tests)
-   upload_protocol = scp
-   upload_port = pi@raspberrypi.local:/tmp/program
-
-   ; Test configuration
-   test_transport = ssh
-   test_build_src = yes  ; Include src/ files in test builds
-   ```
-
-2. **Write tests** using Unity framework:
-   ```c
-   #include <unity.h>
-
-   void test_example(void) {
-       TEST_ASSERT_EQUAL(42, my_function());
-   }
-
-   int main(int argc, char **argv) {
-       UNITY_BEGIN();
-       RUN_TEST(test_example);
-       return UNITY_END();
-   }
-   ```
-
-3. **Run tests:**
-   ```bash
-   pio test
-   ```
-
-### Features
-
-- **Automated SSH deployment** - Tests are uploaded and executed automatically
-- **Real-time results** - Test output streamed back to host as it runs
-- **CI/CD ready** - Perfect for GitHub Actions, GitLab CI, Jenkins
-- **Hardware testing** - Run integration tests on actual GPIO, I2C, SPI devices
-- **Multiple targets** - Run same tests on different boards in parallel
-
-### Use Cases
-
-1. **Unit Tests** - Test business logic on target architecture
-2. **Integration Tests** - Test hardware interaction (GPIO, sensors, displays)
-3. **System Tests** - End-to-end testing on real hardware
-4. **CI/CD Pipelines** - Automated testing before deployment
-
-### Example Output
-
-```
-Testing remote-testing:raspberrypi_3b [PASSED]
-===========================================
-
-test/test_math/test_main.c:18:test_addition      [PASSED]
-test/test_math/test_main.c:24:test_subtraction   [PASSED]
-test/test_gpio/test_main.c:31:test_led_blink     [PASSED]
-
-----------------------
-3 Tests 0 Failures 0 Ignored
-OK
-```
-
-### See Also
-
-- **Testing Guide:** [`REMOTE_TESTING.md`](REMOTE_TESTING.md) - Comprehensive testing guide with CI/CD examples
-- **Example Project:** [`examples/remote-testing/`](examples/remote-testing/) - Complete working example
-- **PlatformIO Testing Docs:** https://docs.platformio.org/en/latest/advanced/unit-testing/
+- Complete guide: [`examples/remote-debugging/README.md`](examples/remote-debugging/README.md)
+- Working example: [`examples/remote-debugging/`](examples/remote-debugging/)
+- PlatformIO Debug docs: https://docs.platformio.org/en/latest/plus/debugging.html
 
 ## Run the compiled program
 

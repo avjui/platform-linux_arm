@@ -16,5 +16,24 @@
     "maximum_size": 17179869184
   },
   "url": "https://www.raspberrypi.com/products/raspberry-pi-5/",
-  "vendor": "Raspberry Pi"
+  "vendor": "Raspberry Pi",
+  "debug": {
+    "default_tool": "gdbserver-ssh",
+    "tools": {
+      "gdbserver-ssh": {
+        "server": {
+          "package": null,
+          "executable": null,
+          "arguments": []
+        }
+      },
+      "gdb-remote": {
+        "server": {
+          "package": null,
+          "executable": null,
+          "arguments": []
+        }
+      }
+    }
+  }
 }
