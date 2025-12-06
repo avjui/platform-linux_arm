@@ -7,6 +7,7 @@ Linux ARM is a Unix-like and mostly POSIX-compliant computer operating system (O
 **Key Features:**
 - Cross-compilation support from Linux x86_64, macOS (Intel/ARM), and Windows
 - Native compilation on ARM Linux systems
+- **Automated deployment** to remote targets via SCP, rsync, or SSH
 - Support for Raspberry Pi 1-5, Pi 400, Compute Module 4, and Zero/Zero 2W
 - Support for Orange Pi Zero (Allwinner H2+/H3)
 - Modern GPIO frameworks: lgpio (Pi 5 compatible) and pigpio
@@ -235,13 +236,69 @@ pio run -e raspberrypi_4b
 pio run --target clean
 ```
 
+## Upload and deploy to remote target
+
+The platform supports **automated deployment** to remote Raspberry Pi or Orange Pi devices via SCP, rsync, or SSH:
+
+```bash
+# Upload using configured protocol
+pio run --target upload
+
+# Or combined: build + upload
+pio run -t upload
+```
+
+**Quick setup** in `platformio.ini`:
+
+```ini
+[env:raspberrypi_4b]
+platform = linux_arm
+board = raspberrypi_4b
+framework = lgpio
+
+; Upload configuration
+upload_protocol = scp
+upload_port = pi@raspberrypi.local:/home/pi/myapp
+```
+
+**Supported upload protocols:**
+- **`scp`** - Secure copy (recommended, simple and reliable)
+- **`rsync`** - Incremental sync (faster for repeated uploads)
+- **`ssh`** - SSH with piped input (alternative method)
+- **`manual`** - Shows instructions only (default)
+
+**See detailed documentation:**
+- Complete guide: [`docs/UPLOAD.md`](docs/UPLOAD.md)
+- Working example: [`examples/remote-deployment/`](examples/remote-deployment/)
+
 ## Run the compiled program
+
+### Option 1: Automated upload and execution
+
+Configure automatic execution after upload:
+
+```ini
+upload_protocol = scp
+upload_port = pi@raspberrypi.local:/home/pi/myapp
+upload_run_after = true
+```
+
+Then run:
+```bash
+pio run -t upload  # Builds, uploads, and runs automatically
+```
+
+### Option 2: Manual transfer and execution
 
 Transfer the compiled binary to your Raspberry Pi and run it:
 
 ```bash
-# On your Raspberry Pi
-.pio/build/raspberrypi_4b/program
+# Copy to target
+scp .pio/build/raspberrypi_4b/program pi@raspberrypi.local:/home/pi/
+
+# SSH and run
+ssh pi@raspberrypi.local
+sudo /home/pi/program  # Use sudo for GPIO access
 ```
 
 # Configuration

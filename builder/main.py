@@ -84,6 +84,18 @@ target_size = env.Alias("size", target_bin, env.VerboseAction(
 AlwaysBuild(target_size)
 
 #
+# Target: Upload program to remote target
+#
+
+def _upload_handler(target, source, env):
+    """Handler for upload target - delegates to platform.on_upload()"""
+    platform = env.PioPlatform()
+    return platform.on_upload(target, source, env)
+
+target_upload = env.Alias("upload", target_bin, _upload_handler)
+AlwaysBuild(target_upload)
+
+#
 # Default targets
 #
 
