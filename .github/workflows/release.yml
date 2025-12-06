@@ -1,0 +1,156 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v2.1.3, etc.
+
+permissions:
+  contents: write  # Required to create releases
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for changelog generation
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          # Remove 'v' prefix from tag to get version number
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Verify platform.json version matches tag
+        run: |
+          # Extract version from platform.json
+          PLATFORM_VERSION=$(python -c "import json; print(json.load(open('platform.json'))['version'])")
+          TAG_VERSION="${{ steps.version.outputs.version }}"
+
+          echo "platform.json version: $PLATFORM_VERSION"
+          echo "Git tag version: $TAG_VERSION"
+
+          if [ "$PLATFORM_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: Version mismatch!"
+            echo "platform.json has version $PLATFORM_VERSION but tag is $TAG_VERSION"
+            exit 1
+          fi
+
+      - name: Generate changelog from commits
+        id: changelog
+        run: |
+          # Get previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, generating changelog from all commits"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --reverse)
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to ${{ steps.version.outputs.tag }}"
+            COMMITS=$(git log $PREVIOUS_TAG..HEAD --pretty=format:"- %s (%h)" --reverse)
+          fi
+
+          # Create changelog file
+          cat > RELEASE_CHANGELOG.md << 'EOF'
+          ## What's Changed
+
+          $COMMITS
+
+          ## Installation
+
+          ### PlatformIO Registry (Recommended)
+          ```bash
+          # Install from PlatformIO Registry (once published)
+          pio pkg install --global --platform platformio/linux_arm@${{ steps.version.outputs.version }}
+          ```
+
+          ### GitHub Installation
+          ```bash
+          # Install directly from this release
+          pio pkg install --global --platform https://github.com/${{ github.repository }}/archive/${{ steps.version.outputs.tag }}.zip
+          ```
+
+          ### Manual Installation
+          1. Download the source code archive below
+          2. Extract to your PlatformIO platforms directory
+          3. Run: `pio pkg install --global --platform file://path/to/extracted/platform`
+
+          ## Supported Boards
+
+          - Raspberry Pi 1 Model B
+          - Raspberry Pi 2 Model B
+          - Raspberry Pi 3 Model B
+          - Raspberry Pi 4 Model B
+          - Raspberry Pi 5
+          - Raspberry Pi 400
+          - Raspberry Pi Compute Module 4
+          - Raspberry Pi Zero / Zero 2W
+
+          ## Supported Frameworks
+
+          - **lgpio**: Modern GPIO library (recommended, supports all Pi models including Pi 5)
+          - **pigpio**: Legacy GPIO daemon (Pi 1-4 only, deprecated)
+          - **WiringPi**: Community GC2 fork (legacy compatibility)
+          - **Bare-metal**: Framework-less C/C++ applications
+
+          ## Cross-Compilation Support
+
+          - Linux x86_64
+          - macOS (Intel and Apple Silicon)
+          - Windows (with ARM GNU Toolchain)
+          - Native ARM Linux (no cross-compiler needed)
+
+          ## Architecture Support
+
+          - 32-bit ARM (ARMv7) - default
+          - 64-bit ARM (AArch64/ARMv8) - optional for Pi 4/5
+
+          ## Documentation
+
+          - [README.md](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.tag }}/README.md)
+          - [CONTRIBUTING.md](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.tag }}/CONTRIBUTING.md)
+          - [lgpio Setup Guide](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.tag }}/docs/LGPIO_SETUP.md)
+          - [Framework Decision Guide](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.tag }}/docs/GPIO_FRAMEWORK_DECISION.md)
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREVIOUS_TAG...${{ steps.version.outputs.tag }}
+          EOF
+
+          # Substitute variables
+          sed -i "s/\$COMMITS/$COMMITS/g" RELEASE_CHANGELOG.md
+
+      - name: Install PlatformIO Core
+        run: pip install -U platformio
+
+      - name: Validate platform package
+        run: |
+          # Install platform locally to validate
+          pio pkg install --global --platform file://.
+          # List installed platforms to verify
+          pio pkg list --global --only-platforms
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.tag }}
+          body_path: RELEASE_CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.tag, 'alpha') || contains(steps.version.outputs.tag, 'beta') || contains(steps.version.outputs.tag, 'rc') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post-release notification
+        run: |
+          echo "✅ Release ${{ steps.version.outputs.tag }} created successfully!"
+          echo "📦 Platform version: ${{ steps.version.outputs.version }}"
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }}"
