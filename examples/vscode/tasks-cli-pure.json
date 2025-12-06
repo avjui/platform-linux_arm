@@ -1,0 +1,81 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PlatformIO: SSH Monitor - Pure CLI",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-l",
+                "-c",
+                "command -v pio >/dev/null 2>&1 && pio run --target sshmonitor || platformio run --target sshmonitor"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: Upload and Monitor (SSH) - Pure CLI",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-l",
+                "-c",
+                "command -v pio >/dev/null 2>&1 && pio run --target upload --target sshmonitor || platformio run --target upload --target sshmonitor"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: SSH Monitor - Specific Environment",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-l",
+                "-c",
+                "command -v pio >/dev/null 2>&1 && pio run --target sshmonitor --environment raspberrypi_5 || platformio run --target sshmonitor --environment raspberrypi_5"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: Upload and Monitor (SSH) - Specific Environment",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-l",
+                "-c",
+                "command -v pio >/dev/null 2>&1 && pio run --target upload --target sshmonitor --environment raspberrypi_5 || platformio run --target upload --target sshmonitor --environment raspberrypi_5"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        }
+    ]
+}

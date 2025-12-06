@@ -60,8 +60,8 @@ This example works on all Raspberry Pi boards:
 - Raspberry Pi 2 Model B
 - Raspberry Pi 3 Model B
 - Raspberry Pi 4 Model B
+- Raspberry Pi 5
 - Raspberry Pi Zero
-- Raspberry Pi 5 (when board definition is added)
 
 To build for a different board, edit `platformio.ini` and change the `board` value.
 

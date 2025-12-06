@@ -1,0 +1,85 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PlatformIO: Monitor (SSH)",
+            "type": "process",
+            "command": "${command:platformio-ide.run}",
+            "args": [
+                "--target",
+                "monitor",
+                "--environment",
+                "${command:pickPlatformIOProjectEnv}"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: Upload and Monitor (SSH)",
+            "type": "process",
+            "command": "${command:platformio-ide.run}",
+            "args": [
+                "--target",
+                "upload",
+                "--target",
+                "monitor",
+                "--environment",
+                "${command:pickPlatformIOProjectEnv}"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: Monitor (SSH) - CLI Fallback",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-l",
+                "-c",
+                "command -v pio >/dev/null 2>&1 && pio run --target monitor --environment ${command:pickPlatformIOProjectEnv} || platformio run --target monitor --environment ${command:pickPlatformIOProjectEnv}"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: Upload and Monitor (SSH) - CLI Fallback",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-l",
+                "-c",
+                "command -v pio >/dev/null 2>&1 && pio run --target upload --target monitor --environment ${command:pickPlatformIOProjectEnv} || platformio run --target upload --target monitor --environment ${command:pickPlatformIOProjectEnv}"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        }
+    ]
+}

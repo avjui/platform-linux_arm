@@ -1,0 +1,89 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PlatformIO: SSH Monitor",
+            "type": "shell",
+            "command": "~/.platformio/penv/bin/pio",
+            "args": [
+                "run",
+                "--target",
+                "sshmonitor"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: Upload and Monitor (SSH)",
+            "type": "shell",
+            "command": "~/.platformio/penv/bin/pio",
+            "args": [
+                "run",
+                "--target",
+                "upload",
+                "--target",
+                "sshmonitor"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: SSH Monitor (Specific Env)",
+            "type": "shell",
+            "command": "~/.platformio/penv/bin/pio",
+            "args": [
+                "run",
+                "--target",
+                "sshmonitor",
+                "--environment",
+                "raspberrypi_5"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "PlatformIO: Upload and Monitor (Specific Env)",
+            "type": "shell",
+            "command": "~/.platformio/penv/bin/pio",
+            "args": [
+                "run",
+                "--target",
+                "upload",
+                "--target",
+                "sshmonitor",
+                "--environment",
+                "raspberrypi_5"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        }
+    ]
+}
