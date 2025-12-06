@@ -113,6 +113,63 @@ def _test_upload_handler(target, source, env):
 env.Replace(UPLOADTESTCMD=_test_upload_handler)
 
 #
+# Target: Monitor remote program via SSH
+#
+
+def _monitor_handler(target, source, env) -> int:
+    """
+    Handle remote program monitoring target.
+
+    Connects to remote target via SSH and runs the program,
+    streaming output in real-time (similar to serial monitor for microcontrollers).
+
+    Args:
+        target: Build target.
+        source: List of source files (binary path).
+        env: SCons environment object.
+
+    Returns:
+        int: Exit code from remote program execution.
+
+    See Also:
+        - Linux_armPlatform.on_monitor: Platform monitor implementation
+    """
+    platform = env.PioPlatform()
+    # Check if platform has on_monitor method
+    if hasattr(platform, 'on_monitor'):
+        return platform.on_monitor(target, source, env)
+    else:
+        # Fallback: show instructions if monitor not implemented
+        print("\n" + "="*60)
+        print("Remote monitoring is not configured.")
+        print("="*60)
+        print("\nTo monitor your remote program, use one of:")
+        print("  1. Enable upload_run_after = true in platformio.ini")
+        print("  2. Manually SSH to target: ssh user@host")
+        print("="*60 + "\n")
+        return 0
+
+# Use AddCustomTarget to properly override PlatformIO's built-in monitor
+env.AddCustomTarget(
+    name="monitor",
+    dependencies=None,
+    actions=_monitor_handler,
+    title="Monitor",
+    description="Monitor remote program via SSH",
+    always_build=True
+)
+
+# Add a custom SSH monitor target that definitely won't conflict
+env.AddCustomTarget(
+    name="sshmonitor",
+    dependencies=None,
+    actions=_monitor_handler,
+    title="SSH Monitor",
+    description="Monitor remote program via SSH (guaranteed to use custom handler)",
+    always_build=True
+)
+
+#
 # Default targets
 #
 
