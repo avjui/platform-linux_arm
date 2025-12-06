@@ -7,6 +7,7 @@
   "frameworks": [
     "wiringpi",
     "lgpio",
+    "libgpiod",
     "pigpio"
   ],
   "name": "Raspberry Pi Zero 2 W",

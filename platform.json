@@ -19,17 +19,22 @@
   "version": "1.6.0",
   "frameworks": {
     "wiringpi": {
-      "package": "framework-wiringpi",
       "script": "builder/frameworks/wiringpi.py",
-      "description": "WiringPi is a GPIO access library written in C for the BCM2835 used in the Raspberry Pi. It's designed to be familiar to people who have used the Arduino 'wiring' system",
-      "url": "http://wiringpi.com",
-      "title": "WiringPi"
+      "description": "WiringPi is a GPIO access library written in C for the BCM2835+ used in the Raspberry Pi. Now maintained by GC2 (Grazer Computer Club) with Raspberry Pi 5 support (GCLK function not supported on Pi 5)",
+      "url": "https://github.com/WiringPi/WiringPi",
+      "title": "WiringPi (GC2 Fork)"
     },
     "lgpio": {
       "script": "builder/frameworks/lgpio.py",
       "description": "lgpio is a modern C library for Linux GPIO access, supporting all Raspberry Pi models including Pi 5 with the RP1 I/O controller",
       "url": "http://abyz.me.uk/lg/index.html",
       "title": "lgpio"
+    },
+    "libgpiod": {
+      "script": "builder/frameworks/libgpiod.py",
+      "description": "libgpiod is the official Linux kernel GPIO library using the character device interface (/dev/gpiochip*). Works across all Linux ARM SBCs (Raspberry Pi, Orange Pi, Rock Pi, etc.) with kernel-enforced GPIO exclusivity",
+      "url": "https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/",
+      "title": "libgpiod"
     },
     "pigpio": {
       "script": "builder/frameworks/pigpio.py",
@@ -43,12 +48,44 @@
       "type": "toolchain",
       "owner": "platformio",
       "version": "~1.40802.0"
-    },
-    "framework-wiringpi": {
-      "type": "framework",
-      "optional": true,
-      "owner": "platformio",
-      "version": "~1.242.0"
+    }
+  },
+  "debug": {
+    "tools": {
+      "gdb-remote": {
+        "server": {
+          "package": null,
+          "executable": null,
+          "arguments": []
+        },
+        "init_cmds": [
+          "target extended-remote $DEBUG_PORT",
+          "monitor reset halt",
+          "load",
+          "monitor reset halt"
+        ],
+        "extra_cmds": [
+          "break main",
+          "continue"
+        ]
+      },
+      "gdbserver-ssh": {
+        "server": {
+          "package": null,
+          "executable": null,
+          "arguments": []
+        },
+        "init_cmds": [
+          "target extended-remote | ssh -T $UPLOAD_PORT gdbserver - $PROG_PATH",
+          "set remote exec-file $PROG_PATH",
+          "set sysroot /",
+          "file $PROG_PATH"
+        ],
+        "extra_cmds": [
+          "break main",
+          "continue"
+        ]
+      }
     }
   }
 }
