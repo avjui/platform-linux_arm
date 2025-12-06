@@ -1,5 +1,6 @@
 {
   "build": {
+    "arch": "armv7",
     "extra_flags": "-DRASPBERRYPI -DRASPBERRYPI400",
     "f_cpu": "1800000000L",
     "mcu": "bcm2711"

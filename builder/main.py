@@ -41,14 +41,33 @@ systype = get_systype()
 is_native = "linux_arm" in systype or "linux_aarch64" in systype
 
 if not is_native:
-    # Cross-compilation to ARMv7 (32-bit ARM with hard-float)
-    env.Replace(_BINPREFIX="arm-linux-gnueabihf-")
-    print("Cross-compiling for ARM Linux (ARMv7)")
-    print("Using toolchain prefix: arm-linux-gnueabihf-")
-    print("Ensure toolchain is installed:")
-    print("  Linux:   sudo apt install gcc-arm-linux-gnueabihf")
-    print("  macOS:   brew install arm-linux-gnueabihf-binutils")
-    print("  Windows: Install ARM GNU Toolchain from ARM Developer site")
+    # Detect target architecture from board configuration
+    board = env.BoardConfig()
+    target_arch = board.get("build.arch", "armv7")  # Default to 32-bit for backward compatibility
+
+    # Check if user explicitly set architecture via board_build.arch in platformio.ini
+    # This takes precedence over board definition
+    if env.GetProjectOption("board_build.arch", None):
+        target_arch = env.GetProjectOption("board_build.arch")
+
+    # Pi 4/5 with 64-bit OS use aarch64 architecture
+    if target_arch == "aarch64":
+        env.Replace(_BINPREFIX="aarch64-linux-gnu-")
+        print("Cross-compiling for ARM Linux (AArch64/ARMv8 64-bit)")
+        print("Using toolchain prefix: aarch64-linux-gnu-")
+        print("Ensure toolchain is installed:")
+        print("  Linux:   sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu")
+        print("  macOS:   brew tap messense/macos-cross-toolchains")
+        print("           brew install aarch64-unknown-linux-gnu")
+    else:
+        # Default: 32-bit ARMv7 (backward compatible)
+        env.Replace(_BINPREFIX="arm-linux-gnueabihf-")
+        print("Cross-compiling for ARM Linux (ARMv7 32-bit)")
+        print("Using toolchain prefix: arm-linux-gnueabihf-")
+        print("Ensure toolchain is installed:")
+        print("  Linux:   sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf")
+        print("  macOS:   brew tap messense/macos-cross-toolchains")
+        print("           brew install arm-unknown-linux-gnueabihf")
 
 #
 # Target: Build executable program

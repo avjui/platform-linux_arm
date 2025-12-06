@@ -106,12 +106,16 @@ for base_path in lgpio_search_paths:
                 print("Found lgpio at: %s (multiarch armhf)" % base_path)
                 break
 
-        # Check standard lib path (native package)
-        if isfile(join(lib_path, "liblgpio.so")) or isfile(join(lib_path, "liblgpio.so.1")):
-            lgpio_include = inc_path
-            lgpio_lib = lib_path
-            print("Found lgpio at: %s" % base_path)
-            break
+        # Check standard lib path (native package or architecture-neutral paths only)
+        # Skip this fallback for architecture-specific base paths to avoid wrong-arch libraries
+        is_arch_specific_path = ("arm-linux-gnueabihf" in base_path or "aarch64-linux-gnu" in base_path)
+
+        if not is_arch_specific_path:
+            if isfile(join(lib_path, "liblgpio.so")) or isfile(join(lib_path, "liblgpio.so.1")):
+                lgpio_include = inc_path
+                lgpio_lib = lib_path
+                print("Found lgpio at: %s" % base_path)
+                break
 
 if not lgpio_include or not lgpio_lib:
     arch_name = "aarch64 (64-bit)" if is_aarch64 else "armhf (32-bit)"

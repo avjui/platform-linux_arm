@@ -61,6 +61,47 @@ sudo apt install liblgpio-dev:armhf liblgpio1:armhf
 
 **Note**: Multi-arch can have dependency conflicts. Option 1 is recommended.
 
+## 64-bit ARM (AArch64) Cross-Compilation
+
+For building 64-bit binaries for Raspberry Pi 4/5/400/CM4 with 64-bit OS:
+
+### Option 1: Build from Source for AArch64 (Recommended)
+
+```bash
+# 1. Install AArch64 cross-compiler
+sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+# 2. Clone and build lgpio
+cd /tmp
+git clone https://github.com/joan2937/lg.git
+cd lg
+
+# 3. Build library for AArch64
+make CC=aarch64-linux-gnu-gcc AR=aarch64-linux-gnu-ar
+
+# 4. Install to cross-compiler sysroot
+sudo make install \
+    prefix=/usr/local/aarch64-linux-gnu \
+    CC=aarch64-linux-gnu-gcc
+```
+
+### Option 2: System Package with Multi-Arch (Advanced)
+
+```bash
+# 1. Add arm64 architecture
+sudo dpkg --add-architecture arm64
+
+# 2. Configure apt sources for arm64
+# Edit /etc/apt/sources.list and add:
+deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports noble main universe
+
+# 3. Update and install
+sudo apt update
+sudo apt install liblgpio-dev:arm64 liblgpio1:arm64
+```
+
+The platform will automatically detect the aarch64 libraries when you set `board_build.arch = aarch64` in your `platformio.ini`.
+
 ## Raspberry Pi 1 (Original Models A/B/A+/B+) Support
 
 lgpio supports Pi 1, but requires a workaround for old-style revision codes:

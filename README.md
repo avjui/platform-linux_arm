@@ -46,6 +46,54 @@ Download and install the ARM GNU Toolchain from the [ARM Developer website](http
 
 When running PlatformIO directly on a Raspberry Pi or other ARM Linux system, the platform uses the system's native GCC compiler. No additional toolchain installation is required.
 
+# Architecture Support (32-bit vs 64-bit)
+
+This platform supports both 32-bit ARM (ARMv7) and 64-bit ARM (AArch64/ARMv8) architectures.
+
+## Default: 32-bit ARM (ARMv7)
+
+By default, all boards use 32-bit cross-compilation for maximum compatibility. This works with both 32-bit and 64-bit Raspberry Pi OS installations.
+
+**Toolchain requirements:**
+```bash
+# Linux
+sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+
+# macOS
+brew tap messense/macos-cross-toolchains
+brew install arm-unknown-linux-gnueabihf
+```
+
+## 64-bit ARM (AArch64) - Optional
+
+For Raspberry Pi 4, Pi 5, Pi 400, and CM4 running a 64-bit OS, you can build 64-bit binaries by setting `board_build.arch = aarch64` in your `platformio.ini`:
+
+```ini
+[env:raspberrypi_5_64bit]
+platform = linux_arm
+board = raspberrypi_5
+framework = lgpio
+board_build.arch = aarch64
+```
+
+**Toolchain requirements:**
+```bash
+# Linux
+sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+# macOS
+brew tap messense/macos-cross-toolchains
+brew install aarch64-unknown-linux-gnu
+```
+
+**Note:** 64-bit builds require a 64-bit Raspberry Pi OS installation on the target device. For cross-compilation setup with lgpio framework, you'll also need the 64-bit library:
+
+```bash
+# For cross-compilation with lgpio on 64-bit targets
+sudo dpkg --add-architecture arm64
+sudo apt install liblgpio-dev:arm64
+```
+
 # Supported Boards
 
 ## Raspberry Pi Boards
