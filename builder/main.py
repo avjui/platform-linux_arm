@@ -132,7 +132,10 @@ env.Replace(
     RANLIB="${_BINPREFIX}ranlib",
     SIZETOOL="${_BINPREFIX}size",
 
-    SIZEPRINTCMD='$SIZETOOL $SOURCES'
+    SIZEPRINTCMD='$SIZETOOL $SOURCES',
+
+    # Linux executables have no extension (override Windows default of .exe)
+    PROGSUFFIX=""
 )
 
 # Detect if we're cross-compiling (not native ARM Linux)
