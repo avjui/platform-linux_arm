@@ -52,6 +52,8 @@ License: Apache 2.0
 
 import sys
 import os
+import shutil
+from platform import system as get_os_name
 
 from SCons.Script import AlwaysBuild, Default, DefaultEnvironment
 
@@ -68,6 +70,56 @@ if platform_dir not in sys.path:
 
 # Import platform_constants after sys.path is configured
 from platform_constants import Architecture, SystemType, ToolchainPrefix
+
+
+def get_toolchain_prefix(arch: str) -> str:
+    """
+    Get the appropriate toolchain prefix for the target architecture.
+    
+    Handles different naming conventions across platforms:
+    - Linux (apt):     arm-linux-gnueabihf- / aarch64-linux-gnu-
+    - macOS (brew):    arm-linux-gnueabihf- / aarch64-linux-gnu-
+    - Windows (ARM):   arm-none-linux-gnueabihf- / aarch64-none-linux-gnu-
+    
+    Args:
+        arch: Target architecture (Architecture.ARMV7 or Architecture.AARCH64)
+    
+    Returns:
+        The first available toolchain prefix found in PATH, or the
+        platform-appropriate default if none found.
+    """
+    if arch == Architecture.AARCH64:
+        # AArch64/ARMv8 64-bit toolchain prefixes
+        if get_os_name() == "Windows":
+            candidates = [
+                "aarch64-none-linux-gnu-",   # ARM official (Windows)
+                "aarch64-linux-gnu-",         # Alternative
+            ]
+        else:
+            candidates = [
+                "aarch64-linux-gnu-",         # System packages (Linux/macOS)
+                "aarch64-none-linux-gnu-",    # ARM official
+            ]
+    else:
+        # ARMv7 32-bit toolchain prefixes
+        if get_os_name() == "Windows":
+            candidates = [
+                "arm-none-linux-gnueabihf-",  # ARM official (Windows)
+                "arm-linux-gnueabihf-",        # Alternative
+            ]
+        else:
+            candidates = [
+                "arm-linux-gnueabihf-",        # System packages (Linux/macOS)
+                "arm-none-linux-gnueabihf-",   # ARM official
+            ]
+    
+    # Find first available toolchain in PATH
+    for prefix in candidates:
+        if shutil.which(prefix + "gcc"):
+            return prefix
+    
+    # Return platform-appropriate default (will fail with clear error if not installed)
+    return candidates[0]
 
 env.Replace(
     _BINPREFIX="",
@@ -99,22 +151,28 @@ if not is_native:
 
     # Pi 4/5 with 64-bit OS use aarch64 architecture
     if target_arch == Architecture.AARCH64:
-        env.Replace(_BINPREFIX=ToolchainPrefix.AARCH64)
+        toolchain_prefix = get_toolchain_prefix(Architecture.AARCH64)
+        env.Replace(_BINPREFIX=toolchain_prefix)
         print("Cross-compiling for ARM Linux (AArch64/ARMv8 64-bit)")
-        print("Using toolchain prefix: aarch64-linux-gnu-")
+        print(f"Using toolchain prefix: {toolchain_prefix}")
         print("Ensure toolchain is installed:")
         print("  Linux:   sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu")
         print("  macOS:   brew tap messense/macos-cross-toolchains")
         print("           brew install aarch64-unknown-linux-gnu")
+        print("  Windows: Download from https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads")
+        print("           (aarch64-none-linux-gnu variant)")
     else:
         # Default: 32-bit ARMv7 (backward compatible)
-        env.Replace(_BINPREFIX=ToolchainPrefix.ARMV7)
+        toolchain_prefix = get_toolchain_prefix(Architecture.ARMV7)
+        env.Replace(_BINPREFIX=toolchain_prefix)
         print("Cross-compiling for ARM Linux (ARMv7 32-bit)")
-        print("Using toolchain prefix: arm-linux-gnueabihf-")
+        print(f"Using toolchain prefix: {toolchain_prefix}")
         print("Ensure toolchain is installed:")
         print("  Linux:   sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf")
         print("  macOS:   brew tap messense/macos-cross-toolchains")
         print("           brew install arm-unknown-linux-gnueabihf")
+        print("  Windows: Download from https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads")
+        print("           (arm-none-linux-gnueabihf variant)")
 
 #
 # Target: Build executable program
